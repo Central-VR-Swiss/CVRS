@@ -95,7 +95,14 @@ public class JAVA_to_VRML extends initializ
 			PrintWriter pw = new PrintWriter
 			(new BufferedWriter(new FileWriter("Test.wrl")));
 			
-			
+			pw.println("#VRML V2.0 utf8");
+			pw.println("Test1");
+			pw.println("Shape {")
+			pw.println("	geometry PointSet{}")
+			pw.println("	appearance Appearance {")
+			pw.println("		material Material {})"
+			pw.println("	}")
+			pw.println("}")
 			
 			pw.close();
 		}
