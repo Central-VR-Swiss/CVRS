@@ -87,7 +87,7 @@ public class MapPoints {
 }
 
 import java.io.*;
-public class JAVA_to_VRML 
+public class JAVA_to_VRML extends initializ
 {
 	public static void main(String[] args)
 	{
