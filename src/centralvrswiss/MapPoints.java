@@ -6,9 +6,12 @@
 package centralvrswiss;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -84,31 +87,57 @@ public class MapPoints {
             Logger.getLogger(CentralVRSwiss.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-}
+    
+    public void JAVA_to_VRML() {
+        try {
+            PrintWriter pw = new PrintWriter(new File("Test.wrl"));
+            StringBuilder sb = new StringBuilder();
 
-import java.io.*;
-public class JAVA_to_VRML extends initializ
-{
-	public static void main(String[] args)
-	{
-		try{
-			PrintWriter pw = new PrintWriter
-			(new BufferedWriter(new FileWriter("Test.wrl")));
-			
-			pw.println("#VRML V2.0 utf8");
-			pw.println("Test1");
-			pw.println("Shape {")
-			pw.println("	geometry PointSet{}")
-			pw.println("	appearance Appearance {")
-			pw.println("		material Material {})"
-			pw.println("	}")
-			pw.println("}")
-			
-			pw.close();
-		}
-		catch(IOException e){
-			System.out.println("入出力エラー");
-		}
-	}
-}
+            sb.append("#VRML V2.0 utf8\n");
+            sb.append("# Test1\n");
+            sb.append("Shape {\n");
+            sb.append("\tgeometry PointSet {\n");
+            sb.append("\t\tcoord Coordinate {\n");
+            sb.append("\t\t\tpoint [\n");
+            for(int i = 0; i < xAxe.size(); ++i) {
+                sb.append("\t\t\t\t").
+                    append(xAxe.get(i)).append(' ').
+                    append(yAxe.get(i)).append(' ').
+                    append(zAxe.get(i)).append('\n');
+            }
+            sb.append("\t\t\t]\n");
+            sb.append("\t\t}\n");
+            sb.append("\t}\n");
+            sb.append("	appearance Appearance {\n");
+            sb.append("		material Material {}\n");
+            sb.append("	}\n");
+            sb.append("}\n");
 
+//    Shape {
+//	geometry PointSet {
+//		coord Coordinate {
+//                    point [
+//                        -1.0 -1.0 0.0,
+//                        1.0 1.0 0.0,
+//                        0.0 0.0 0.0,
+//                    ]
+//                }
+//                color Color {
+//                    color [
+//                        1.0 0.0 0.0,
+//                        0.0 1.0 0.0,
+//                        0.0 0.0 1.0,
+//                    ]
+//                }
+//            }
+//        }
+            
+            pw.write(sb.toString());
+            pw.close();
+            
+        } catch(FileNotFoundException ex){
+            Logger.getLogger(MapPoints.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("入出力エラー");
+        }
+    }
+}

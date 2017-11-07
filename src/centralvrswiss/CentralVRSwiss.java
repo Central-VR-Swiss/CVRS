@@ -35,6 +35,8 @@ public class CentralVRSwiss {
         
         mp.initialize();
         
+        mp.JAVA_to_VRML();
+        
     }
     
      public void getNbPoints(String fileName) {
