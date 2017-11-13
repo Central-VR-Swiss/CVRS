@@ -22,6 +22,8 @@ import java.util.logging.Logger;
  */
 public class MapPoints {
     
+    private final char TAB = '\t';
+    
     private ArrayList xAxe;
     private ArrayList yAxe;
     private ArrayList zAxe;
@@ -70,7 +72,6 @@ public class MapPoints {
                 }
                 currentZ = Double.parseDouble(splitter[count]);
                 // Puting each value in the array
-//                System.out.println(++a + " Wa " + currentX + " We " + currentY + " Wi " + currentZ);
                 xAxe.add(currentX);
                 yAxe.add(currentY);
                 zAxe.add(currentZ);
@@ -96,21 +97,25 @@ public class MapPoints {
             sb.append("#VRML V2.0 utf8\n");
             sb.append("# Test1\n");
             sb.append("Shape {\n");
-            sb.append("\tgeometry PointSet {\n");
-            sb.append("\t\tcoord Coordinate {\n");
-            sb.append("\t\t\tpoint [\n");
+            sb.append(TAB).append("geometry PointSet {\n");
+            
+            sb.append(TAB).append(TAB).append("coord Coordinate {\n");
+            sb.append(TAB).append(TAB).append(TAB).append("point [\n");
             for(int i = 0; i < xAxe.size(); ++i) {
-                sb.append("\t\t\t\t").
+                sb.append(TAB).append(TAB).append(TAB).append(TAB).
                     append(xAxe.get(i)).append(' ').
                     append(yAxe.get(i)).append(' ').
                     append(zAxe.get(i)).append('\n');
             }
-            sb.append("\t\t\t]\n");
-            sb.append("\t\t}\n");
-            sb.append("\t}\n");
-            sb.append("	appearance Appearance {\n");
-            sb.append("		material Material {}\n");
-            sb.append("	}\n");
+            sb.append(TAB).append(TAB).append(TAB).append("]\n");
+            sb.append(TAB).append(TAB).append("}\n");
+            
+            sb.append(TAB).append("}\n");
+            sb.append(TAB).append("appearance Appearance {\n");
+            sb.append(TAB).append(TAB).append("material Material {\n");
+            sb.append(TAB).append(TAB).append(TAB).append("diffuseColor\n").append("1 0 0 #simple red");
+            sb.append(TAB).append(TAB).append("}\n");
+            sb.append(TAB).append("}\n");
             sb.append("}\n");
 
 //    Shape {
@@ -141,3 +146,4 @@ public class MapPoints {
         }
     }
 }
+
