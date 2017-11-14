@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package centralvrswiss;
 
 import java.io.BufferedReader;
@@ -46,13 +41,16 @@ public class MapPoints {
             
             String line;
             String[] splitter;
-            int count = 1, a = 0;
+            int count = 1;
             
+            // Reading line by line the .dat file
             while((line = br.readLine()) != null){
-                splitter = line.split("  ");
+                splitter = line.split("  "); // Separating in an Array when finding 
+                                             // 2 spaces
                 currentX = Double.parseDouble(splitter[count]);
                 count++;
                 
+                // Detecting the -9999.99 values
                 if(splitter[count].contains("-9999.99")){
                     String temp = splitter[count];
                     String[] splitter2 = temp.split(" ");
@@ -78,7 +76,7 @@ public class MapPoints {
                 
                 count = 1;
             }
-            System.out.println("Bruh");
+            System.out.println("Bruh"); // End of the lecture, erase when we will end
             
             br.close();
             ipsr.close();
@@ -93,12 +91,14 @@ public class MapPoints {
         try {
             PrintWriter pw = new PrintWriter(new File("Test.wrl"));
             StringBuilder sb = new StringBuilder();
-
+            
+            // Creating the .wrl file for VR
             sb.append("#VRML V2.0 utf8\n");
             sb.append("# Test1\n");
             sb.append("Shape {\n");
             sb.append(TAB).append("geometry PointSet {\n");
             
+            // Inserting points in the file
             sb.append(TAB).append(TAB).append("coord Coordinate {\n");
             sb.append(TAB).append(TAB).append(TAB).append("point [\n");
             for(int i = 0; i < xAxe.size(); ++i) {
@@ -109,11 +109,12 @@ public class MapPoints {
             }
             sb.append(TAB).append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append(TAB).append("}\n");
-            
             sb.append(TAB).append("}\n");
+            
+            // Giving a color to the block
             sb.append(TAB).append("appearance Appearance {\n");
             sb.append(TAB).append(TAB).append("material Material {\n");
-            sb.append(TAB).append(TAB).append(TAB).append("diffuseColor\n").append("1 0 0 #simple red");
+            sb.append(TAB).append(TAB).append(TAB).append("diffuseColor ").append("1 0 0 #simple red\n");
             sb.append(TAB).append(TAB).append("}\n");
             sb.append(TAB).append("}\n");
             sb.append("}\n");
