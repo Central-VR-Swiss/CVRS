@@ -18,6 +18,11 @@ import java.util.logging.Logger;
 public class MapPoints {
     
     private final char TAB = '\t';
+    private final String RED = "1.0 0.0 0.0";
+    private final String GREEN = "0.0 1.0 0.0";
+    private final String BLUE = "0.0 0.0 1.0";
+    
+    private String color;
     
     private ArrayList xAxe;
     private ArrayList yAxe;
@@ -109,15 +114,34 @@ public class MapPoints {
             }
             sb.append(TAB).append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append(TAB).append("}\n");
-            sb.append(TAB).append("}\n");
             
-            // Giving a color to the block
-            sb.append(TAB).append("appearance Appearance {\n");
-            sb.append(TAB).append(TAB).append("material Material {\n");
-            sb.append(TAB).append(TAB).append(TAB).append("diffuseColor ").append("1 0 0 #simple red\n");
+            sb.append(TAB).append(TAB).append("color Color {\n");
+            sb.append(TAB).append(TAB).append(TAB).append("color [\n");
+            for(int i = 0; i < xAxe.size(); ++i) {
+                if((double)zAxe.get(i) > 0 && (double)zAxe.get(i) < 10) {
+                    color = GREEN;
+                }else if((double)zAxe.get(i) < 0) {
+                    color = BLUE;
+                }else{
+                    color = RED;
+                }
+                
+                sb.append(TAB).append(TAB).append(TAB).append(TAB).
+                    append(color).append('\n');
+            }
+            sb.append(TAB).append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append(TAB).append("}\n");
             sb.append(TAB).append("}\n");
+            
             sb.append("}\n");
+            
+            // Giving a color to the block
+//            sb.append(TAB).append("appearance Appearance {\n");
+//            sb.append(TAB).append(TAB).append("material Material {\n");
+//            sb.append(TAB).append(TAB).append(TAB).append("diffuseColor ").append("1 0 0 #simple red\n");
+//            sb.append(TAB).append(TAB).append("}\n");
+//            sb.append(TAB).append("}\n");
+//            sb.append("}\n");
 
 //    Shape {
 //	geometry PointSet {
