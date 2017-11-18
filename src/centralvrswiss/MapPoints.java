@@ -22,6 +22,9 @@ public class MapPoints {
     private final String GREEN = "0.0 1.0 0.0";
     private final String BLUE = "0.0 0.0 1.0";
     
+    private final double BUILDING_TOP = 10.0;
+    private final double FLOOR = 0.5;
+    
     private String color;
     
     private ArrayList xAxe;
@@ -118,9 +121,9 @@ public class MapPoints {
             sb.append(TAB).append(TAB).append("color Color {\n");
             sb.append(TAB).append(TAB).append(TAB).append("color [\n");
             for(int i = 0; i < xAxe.size(); ++i) {
-                if((double)zAxe.get(i) > 0 && (double)zAxe.get(i) < 10) {
+                if((double)zAxe.get(i) >= FLOOR && (double)zAxe.get(i) <= BUILDING_TOP) {
                     color = GREEN;
-                }else if((double)zAxe.get(i) < 0) {
+                }else if((double)zAxe.get(i) < FLOOR) {
                     color = BLUE;
                 }else{
                     color = RED;
