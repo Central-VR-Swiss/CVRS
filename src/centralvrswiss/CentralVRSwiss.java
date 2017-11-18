@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.Event;
 
+
 //import vrml.*;
 //import vrml.field.*;
 //import vrml.node.*;
@@ -29,11 +30,12 @@ public class CentralVRSwiss {
         
         CentralVRSwiss cvrs = new CentralVRSwiss();
         
-        cvrs.getNbPoints(FILE_NAME);
+    
         
         MapPoints mp = new MapPoints(nbPoints);
         
         mp.initialize();
+        mp.JAVA_to_VRML();
         
     }
     
