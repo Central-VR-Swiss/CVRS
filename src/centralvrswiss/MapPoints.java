@@ -22,8 +22,8 @@ public class MapPoints {
     private final String GREEN = "0.0 1.0 0.0";
     private final String BLUE = "0.0 0.0 1.0";
     
-    private final double BUILDING_TOP = 10.0;
-    private final double FLOOR = 0.5;
+    private final double BUILDING_TOP = 20.0;
+    private final double FLOOR = 0.0;
     
     private String color;
     
