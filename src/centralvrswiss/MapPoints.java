@@ -33,9 +33,9 @@ public class MapPoints {
     private double currentZ;
 
     public MapPoints(int nbPoints) {
-        xAxe = new ArrayList<Double>(nbPoints);
-        yAxe = new ArrayList<Double>(nbPoints);
-        zAxe = new ArrayList<Double>(nbPoints);
+        xAxe = new ArrayList<>(nbPoints);
+        yAxe = new ArrayList<>(nbPoints);
+        zAxe = new ArrayList<>(nbPoints);
     }    
     
     public void initialize() {
@@ -81,7 +81,7 @@ public class MapPoints {
                 
                 count = 1;
             }
-            System.out.println("Bruh"); // End of the lecture, erase when we will end
+            System.out.println("Bruh " + xAxe.size()); // End of the lecture, erase when we will end
             
             br.close();
             ipsr.close();
@@ -174,23 +174,26 @@ public class MapPoints {
         int id = idx-1;
         boolean flag = false;
         boolean c = false;
+//        System.out.println("Yey" + idx);
         //c is to clear that xAxe[idx] is not edge of the map.
-        if((idx>=1) & (idx<=(xAxe.size()-2))){
-            if((Math.abs((double)xAxe.get(idx)-(double)xAxe.get(idx+1))<=1) & (Math.abs((double)xAxe.get(idx)-(double)xAxe.get(idx-1))<=1)){
+        if((idx>=1) && (idx<=(xAxe.size()-2))){
+            if((Math.abs((double)xAxe.get(idx)-(double)xAxe.get(idx+1))<=1) && (Math.abs((double)xAxe.get(idx)-(double)xAxe.get(idx-1))<=1)){
                 c = true;
             }
         }
+        
         if(c){
             double dif1 = Math.abs((double)zAxe.get(idx)-(double)zAxe.get(idx-1));
             double dif2 = Math.abs((double)zAxe.get(idx)-(double)zAxe.get(idx+1));
 
-            if(dif1 > 10 | dif2 > 10){
+            if(dif1 > 10 || dif2 > 10){
                 flag = true;
                 return flag;
             }
+            
             id = idx-2;
             while(id>0 & id<xAxe.size()-1){
-                if(((double)xAxe.get(id) == (double)xAxe.get(idx-1)) & ((double)zAxe.get(idx)!=-9999.99)){
+                if(((double)xAxe.get(id) == (double)xAxe.get(idx-1)) && ((double)zAxe.get(idx)!=-9999.99)){
                     for(int j=0;j<3;j++){
                         if((double)zAxe.get(id+j)!=-9999.99){
                             double dif = Math.abs((double)zAxe.get(idx) - (double)zAxe.get(id+j));
@@ -203,9 +206,10 @@ public class MapPoints {
                 }
                 id--;
             }
+            
             id = idx+1;
-            while(id>0 & id<xAxe.size()-2){
-                if(((double)xAxe.get(id) == (double)xAxe.get(idx-1)) & ((double)zAxe.get(idx)!=-9999.99)){
+            while(id>0 && id<xAxe.size()-2){
+                if(((double)xAxe.get(id) == (double)xAxe.get(idx-1)) && ((double)zAxe.get(idx)!=-9999.99)){
                     for(int j=0; j<3; j++){
                         if((double)zAxe.get(id+j)!=-9999.99){
                             double dif = Math.abs((double)zAxe.get(idx) - (double)zAxe.get(id+j));
