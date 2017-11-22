@@ -7,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,22 +21,25 @@ public class MapPoints {
     private final String RED = "1.0 0.0 0.0";
     private final String GREEN = "0.0 1.0 0.0";
     private final String BLUE = "0.0 0.0 1.0";
+    private final int xs = 1132;
+    private final int ys = 925;
+    private final int dif = 15;
+    private final double er = -9999.99;
     
     private String color;
     
-    private ArrayList<Double> xAxe;
-    private ArrayList<Double> yAxe;
-    private ArrayList<Double> zAxe;
-    
-    private double currentX;
-    private double currentY;
-    private double currentZ;
+    private double[][] zAxe = new double[xs][ys];
+    private double[][] idx = new double[xs][ys];
 
-    public MapPoints(int nbPoints) {
-        xAxe = new ArrayList<Double>(nbPoints);
-        yAxe = new ArrayList<Double>(nbPoints);
-        zAxe = new ArrayList<Double>(nbPoints);
-    }    
+
+    
+    private double cX;
+    private double cY;
+    private double cZ;
+ 
+    public MapPoints(int nbPoints){
+
+    }
     
     public void initialize() {
         try {
@@ -46,40 +49,27 @@ public class MapPoints {
             
             String line;
             String[] splitter;
-            int count = 1;
+            int x;
+            int y;
+
+            for(int i=0; i<xs; ++i){
+                for(int j=0; j<ys; ++j){
+                    zAxe[i][j] = 0;
+                    idx[i][j] = 0;
+                }
+            }
             
             // Reading line by line the .dat file
             while((line = br.readLine()) != null){
-                splitter = line.split("  "); // Separating in an Array when finding 
-                                             // 2 spaces
-                currentX = Double.parseDouble(splitter[count]);
-                count++;
-                
-                // Detecting the -9999.99 values
-                if(splitter[count].contains("-9999.99")){
-                    String temp = splitter[count];
-                    String[] splitter2 = temp.split(" ");
-                    currentY = Double.parseDouble(splitter2[0]);
-                    splitter[count] = splitter2[1]; // "-9999.99"
-                }else{
-                    currentY = Double.parseDouble(splitter[count]);
-                    count++;
-                }
-                
-                if(splitter[count].isEmpty()){
-                    count++;
-                }
-                
-                if(splitter[count].charAt(0) == ' '){
-                    splitter[count] = splitter[count].replaceAll(" ", "");
-                }
-                currentZ = Double.parseDouble(splitter[count]);
+                splitter = line.split("[\\s]+"); // Separating in an Array
+                cX = Double.parseDouble(splitter[1]);
+                cY = Double.parseDouble(splitter[2]);
+                cZ = Double.parseDouble(splitter[3]);
+                x = (int)(cX + 7541);
+                y = (int)(cY + 35126);
                 // Puting each value in the array
-                xAxe.add(currentX);
-                yAxe.add(currentY);
-                zAxe.add(currentZ);
-                
-                count = 1;
+                zAxe[x][y] = cZ;
+                idx[x][y] = 1;
             }
             System.out.println("Bruh"); // End of the lecture, erase when we will end
             
@@ -106,28 +96,38 @@ public class MapPoints {
             // Inserting points in the file
             sb.append(TAB).append(TAB).append("coord Coordinate {\n");
             sb.append(TAB).append(TAB).append(TAB).append("point [\n");
-            for(int i = 0; i < xAxe.size(); ++i) {
-                sb.append(TAB).append(TAB).append(TAB).append(TAB).
-                    append(xAxe.get(i)).append(' ').
-                    append(yAxe.get(i)).append(' ').
-                    append(zAxe.get(i)).append('\n');
+            for(int i = 0; i < xs; ++i) {
+                for(int j = 0; j < ys; ++j){
+                    if(idx[i][j] == 1){
+                        
+                        sb.append(TAB).append(TAB).append(TAB).append(TAB).
+                            append(i).append(' ').
+                            append(j).append(' ').
+                            append(zAxe[i][j]).append('\n');
+                    }
+                }
             }
             sb.append(TAB).append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append(TAB).append("}\n");
             
             sb.append(TAB).append(TAB).append("color Color {\n");
             sb.append(TAB).append(TAB).append(TAB).append("color [\n");
-            for(int i = 0; i < xAxe.size(); ++i) {
-                if(check(i)){
-                    color = RED;
-                }else if((double)zAxe.get(i) < 1){
-                    color = BLUE;
-                }else{
-                    color = GREEN;
-                }
+            for(int i = 0; i < xs; ++i) {
+                for(int j = 0; j < ys; ++j){
+                    if(idx[i][j] == 1){
+                        if(zAxe[i][j] < 0){
+                            color = RED;
+                        }else if(check(i,j)){
+                            color = BLUE;
+                        }else{
+                            color = GREEN;
+                        }
+                    
                 
-                sb.append(TAB).append(TAB).append(TAB).append(TAB).
-                    append(color).append('\n');
+                    sb.append(TAB).append(TAB).append(TAB).append(TAB).
+                        append(color).append('\n');
+                    }
+                }
             }
             sb.append(TAB).append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append(TAB).append("}\n");
@@ -170,55 +170,108 @@ public class MapPoints {
                 System.out.println("入出力エラー");
         }
     }
-    public boolean check(int idx){
-        int id = idx-1;
-        boolean flag = false;
-        boolean c = false;
-        //c is to clear that xAxe[idx] is not edge of the map.
-        if((idx>=1) & (idx<=(xAxe.size()-2))){
-            if((Math.abs((double)xAxe.get(idx)-(double)xAxe.get(idx+1))<=1) & (Math.abs((double)xAxe.get(idx)-(double)xAxe.get(idx-1))<=1)){
-                c = true;
-            }
-        }
-        if(c){
-            double dif1 = Math.abs((double)zAxe.get(idx)-(double)zAxe.get(idx-1));
-            double dif2 = Math.abs((double)zAxe.get(idx)-(double)zAxe.get(idx+1));
-
-            if(dif1 > 10 | dif2 > 10){
-                flag = true;
-                return flag;
-            }
-            id = idx-2;
-            while(id>0 & id<xAxe.size()-1){
-                if(((double)xAxe.get(id) == (double)xAxe.get(idx-1)) & ((double)zAxe.get(idx)!=-9999.99)){
-                    for(int j=0;j<3;j++){
-                        if((double)zAxe.get(id+j)!=-9999.99){
-                            double dif = Math.abs((double)zAxe.get(idx) - (double)zAxe.get(id+j));
-                            if(dif > 10){
-                                flag = true;
-                                return flag;
-                            }
-                        }
-                    } 
-                }
-                id--;
-            }
-            id = idx+1;
-            while(id>0 & id<xAxe.size()-2){
-                if(((double)xAxe.get(id) == (double)xAxe.get(idx-1)) & ((double)zAxe.get(idx)!=-9999.99)){
-                    for(int j=0; j<3; j++){
-                        if((double)zAxe.get(id+j)!=-9999.99){
-                            double dif = Math.abs((double)zAxe.get(idx) - (double)zAxe.get(id+j));
-                            if(dif > 10){
-                                flag = true;
-                                return flag;
-                            }
+    public boolean check(int i, int j){
+        double tmp;
+        if((i>1) && (j>1) && (i<xs-1) && (j<ys-1)){
+            for(int a=-1; a<2; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i+a][j+b]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > dif){
+                            return true;
                         }
                     }
                 }
-                id++;
+            }
+        }else if((j>1) && (i<xs-1) && (j<ys-1)){
+            for(int a=0; a<2; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i+a][j+b]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > dif){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }else if((i>1) && (i<xs-1) && (j<ys-1)){
+            for(int a=-1; a<2; ++a){
+                for(int b=0; b<2; ++b){
+                    if(zAxe[i+a][j+b]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > dif){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }else if((i>1) && (j>1) && (i<xs-1)){
+            for(int a=-1; a<2; ++a){
+                for(int b=-1; b<1; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > dif){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }else if((i>1) && (j<1) && (j<ys-1)){
+            for(int a=-1; a<1; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > dif){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }else if((i>1) && (i<xs-1)){
+            for(int a=-1; a<2; ++a){
+                for(int b=0; b<1; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > dif){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }else if((i>1) && (j<ys-1)){
+            for(int a=-1; a<1; ++a){
+                for(int b=0; b<2; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > dif){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }else if((j<1) && (i<xs-1)){
+            for(int a=0; a<1; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > dif){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }else if((j<1) && (j<ys-1)){
+            for(int a=0; a<2; ++a){
+                for(int b=-1; b<1; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > dif){
+                            return true;
+                        }
+                    }
+                }
             }
         }
-        return flag;
+        return false;
     }
 }
