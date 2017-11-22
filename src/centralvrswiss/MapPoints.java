@@ -21,6 +21,7 @@ public class MapPoints {
     private final String RED = "1.0 0.0 0.0";
     private final String GREEN = "0.0 1.0 0.0";
     private final String BLUE = "0.0 0.0 1.0";
+    private final double ERROR = -9999.99;
     
     private String color;
     
@@ -118,10 +119,10 @@ public class MapPoints {
             sb.append(TAB).append(TAB).append("color Color {\n");
             sb.append(TAB).append(TAB).append(TAB).append("color [\n");
             for(int i = 0; i < xAxe.size(); ++i) {
-                if(check(i)){
-                    color = RED;
-                }else if((double)zAxe.get(i) < 1){
+                if((double)zAxe.get(i) < 1){
                     color = BLUE;
+                }else if(check(i)){
+                    color = RED;
                 }else{
                     color = GREEN;
                 }
@@ -170,33 +171,34 @@ public class MapPoints {
                 System.out.println("入出力エラー");
         }
     }
+    
     public boolean check(int idx){
-        int id = idx-1;
+        int id;
         boolean flag = false;
         boolean c = false;
 //        System.out.println("Yey" + idx);
         //c is to clear that xAxe[idx] is not edge of the map.
-        if((idx>=1) && (idx<=(xAxe.size()-2))){
-            if((Math.abs((double)xAxe.get(idx)-(double)xAxe.get(idx+1))<=1) && (Math.abs((double)xAxe.get(idx)-(double)xAxe.get(idx-1))<=1)){
+        if((idx >= 1) && (idx <= (xAxe.size() - 2))){
+            if((Math.abs((double)xAxe.get(idx) - (double)xAxe.get(idx + 1)) <= 1) && (Math.abs((double)xAxe.get(idx) - (double)xAxe.get(idx - 1)) <= 1)){
                 c = true;
             }
         }
         
         if(c){
-            double dif1 = Math.abs((double)zAxe.get(idx)-(double)zAxe.get(idx-1));
-            double dif2 = Math.abs((double)zAxe.get(idx)-(double)zAxe.get(idx+1));
+            double dif1 = Math.abs((double)zAxe.get(idx) - (double)zAxe.get(idx - 1));
+            double dif2 = Math.abs((double)zAxe.get(idx) - (double)zAxe.get(idx + 1));
 
             if(dif1 > 10 || dif2 > 10){
                 flag = true;
                 return flag;
             }
             
-            id = idx-2;
-            while(id>0 & id<xAxe.size()-1){
-                if(((double)xAxe.get(id) == (double)xAxe.get(idx-1)) && ((double)zAxe.get(idx)!=-9999.99)){
-                    for(int j=0;j<3;j++){
-                        if((double)zAxe.get(id+j)!=-9999.99){
-                            double dif = Math.abs((double)zAxe.get(idx) - (double)zAxe.get(id+j));
+            id = idx - 2;
+            while(id > 0 && id < xAxe.size() - 1){
+                if(((double)xAxe.get(id) == (double)xAxe.get(idx - 1)) && ((double)zAxe.get(idx) != ERROR)){
+                    for(int j=0;j < 3;j++){
+                        if((double)zAxe.get(id + j) != ERROR){
+                            double dif = Math.abs((double)zAxe.get(idx) - (double)zAxe.get(id + j));
                             if(dif > 10){
                                 flag = true;
                                 return flag;
@@ -207,12 +209,12 @@ public class MapPoints {
                 id--;
             }
             
-            id = idx+1;
-            while(id>0 && id<xAxe.size()-2){
-                if(((double)xAxe.get(id) == (double)xAxe.get(idx-1)) && ((double)zAxe.get(idx)!=-9999.99)){
-                    for(int j=0; j<3; j++){
-                        if((double)zAxe.get(id+j)!=-9999.99){
-                            double dif = Math.abs((double)zAxe.get(idx) - (double)zAxe.get(id+j));
+            id = idx + 1;
+            while(id > 0 && id < xAxe.size() - 2){
+                if(((double)xAxe.get(id) == (double)xAxe.get(idx - 1)) && ((double)zAxe.get(idx) != ERROR)){
+                    for(int j=0; j < 3; j++){
+                        if((double)zAxe.get(id + j) != ERROR){
+                            double dif = Math.abs((double)zAxe.get(idx) - (double)zAxe.get(id + j));
                             if(dif > 10){
                                 flag = true;
                                 return flag;
