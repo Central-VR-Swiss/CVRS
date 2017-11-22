@@ -23,13 +23,14 @@ public class MapPoints {
     private final String BLUE = "0.0 0.0 1.0";
     private final int xs = 1132;
     private final int ys = 925;
-    private final int dif = 15;
+    private final int dif = 10;
     private final double er = -9999.99;
+    private final double s_dif = 1.5;
     
     private String color;
     
     private double[][] zAxe = new double[xs][ys];
-    private double[][] idx = new double[xs][ys];
+    private int[][] idx = new int[xs][ys];
 
 
     
@@ -101,6 +102,7 @@ public class MapPoints {
                     if(zAxe[i][j]==er){
                         zAxe[i][j] = deleteErrorPoints(i,j);
                     }
+                    reducePoints(i,j);
                     if(idx[i][j] == 1){
                         
                         sb.append(TAB).append(TAB).append(TAB).append(TAB).
@@ -219,7 +221,7 @@ public class MapPoints {
                     }
                 }
             }
-        }else if((i>1) && (j<1) && (j<ys-1)){
+        }else if((i>1) && (j>1) && (j<ys-1)){
             for(int a=-1; a<1; ++a){
                 for(int b=-1; b<2; ++b){
                     if(zAxe[i][j]!=er){
@@ -252,9 +254,9 @@ public class MapPoints {
                     }
                 }
             }
-        }else if((j<1) && (i<xs-1)){
-            for(int a=0; a<1; ++a){
-                for(int b=-1; b<2; ++b){
+        }else if((j>1) && (i<xs-1)){
+            for(int a=0; a<2; ++a){
+                for(int b=-1; b<1; ++b){
                     if(zAxe[i][j]!=er){
                         tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
                         if(tmp > dif){
@@ -263,9 +265,9 @@ public class MapPoints {
                     }
                 }
             }
-        }else if((j<1) && (j<ys-1)){
-            for(int a=0; a<2; ++a){
-                for(int b=-1; b<1; ++b){
+        }else if((j>1) && (j<ys-1)){
+            for(int a=0; a<1; ++a){
+                for(int b=-1; b<2; ++b){
                     if(zAxe[i][j]!=er){
                         tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
                         if(tmp > dif){
@@ -316,7 +318,7 @@ public class MapPoints {
                     }
                 }
             }
-        }else if((i>1) && (j<1) && (j<ys-1)){
+        }else if((i>1) && (j>1) && (j<ys-1)){
             for(int a=-1; a<1; ++a){
                 for(int b=-1; b<2; ++b){
                     if(zAxe[i][j]!=er){
@@ -343,16 +345,7 @@ public class MapPoints {
                     }
                 }
             }
-        }else if((j<1) && (i<xs-1)){
-            for(int a=0; a<1; ++a){
-                for(int b=-1; b<2; ++b){
-                    if(zAxe[i][j]!=er){
-                        tmp += zAxe[i+a][j+b];
-                        cnt++;
-                    }
-                }
-            }
-        }else if((j<1) && (j<ys-1)){
+        }else if((j>1) && (i<xs-1)){
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<1; ++b){
                     if(zAxe[i][j]!=er){
@@ -361,7 +354,129 @@ public class MapPoints {
                     }
                 }
             }
+        }else if((j>1) && (j<ys-1)){
+            for(int a=0; a<1; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
+                }
+            }
         }
         return tmp/cnt;
+    }
+    public void reducePoints(int i,int j){
+        double tmp;
+        boolean del = true;
+        if((i>1) && (j>1) && (i<xs-1) && (j<ys-1)){
+            for(int a=-1; a<2; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i+a][j+b]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > s_dif){
+                            del = false;
+                        }
+                    }
+                }
+            }
+            if(del) idx[i][j] = 0;
+        }else if((j>1) && (i<xs-1) && (j<ys-1)){
+            for(int a=0; a<2; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i+a][j+b]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > s_dif){
+                            del = false;
+                        }
+                    }
+                }
+            }
+            if(del) idx[i][j] = 0;
+        }else if((i>1) && (i<xs-1) && (j<ys-1)){
+            for(int a=-1; a<2; ++a){
+                for(int b=0; b<2; ++b){
+                    if(zAxe[i+a][j+b]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > s_dif){
+                            del = false;
+                        }
+                    }
+                }
+            }
+            if(del) idx[i][j] = 0;
+        }else if((i>1) && (j>1) && (i<xs-1)){
+            for(int a=-1; a<2; ++a){
+                for(int b=-1; b<1; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > s_dif){
+                            del = false;
+                        }
+                    }
+                }
+            }
+            if(del) idx[i][j] = 0;
+        }else if((i>1) && (j>1) && (j<ys-1)){
+            for(int a=-1; a<1; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > s_dif){
+                            del = false;
+                        }
+                    }
+                }
+            }
+            if(del) idx[i][j] = 0;
+        }else if((i>1) && (i<xs-1)){
+            for(int a=-1; a<2; ++a){
+                for(int b=0; b<1; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > s_dif){
+                            del = false;
+                        }
+                    }
+                }
+            }
+            if(del) idx[i][j] = 0;
+        }else if((i>1) && (j<ys-1)){
+            for(int a=-1; a<1; ++a){
+                for(int b=0; b<2; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > s_dif){
+                            del = false;
+                        }
+                    }
+                }
+            }
+            if(del) idx[i][j] = 0;
+        }else if((j>1) && (i<xs-1)){
+            for(int a=0; a<2; ++a){
+                for(int b=-1; b<1; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > s_dif){
+                            del = false;
+                        }
+                    }
+                }
+            }
+            if(del) idx[i][j] = 0;
+        }else if((j>1) && (j<ys-1)){
+            for(int a=0; a<1; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp = Math.abs(zAxe[i][j] - zAxe[i+a][j+b]);
+                        if(tmp > s_dif){
+                            del = false;
+                        }
+                    }
+                }
+            }
+            if(del) idx[i][j] = 0;
+        }
     }
 }
