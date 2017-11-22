@@ -98,6 +98,9 @@ public class MapPoints {
             sb.append(TAB).append(TAB).append(TAB).append("point [\n");
             for(int i = 0; i < xs; ++i) {
                 for(int j = 0; j < ys; ++j){
+                    if(zAxe[i][j]==er){
+                        zAxe[i][j] = deleteErrorPoints(i,j);
+                    }
                     if(idx[i][j] == 1){
                         
                         sb.append(TAB).append(TAB).append(TAB).append(TAB).
@@ -273,5 +276,92 @@ public class MapPoints {
             }
         }
         return false;
+    }
+    public double deleteErrorPoints(int i,int j){
+        int cnt = 0;
+        double tmp = 0;
+        if((i>1) && (j>1) && (i<xs-1) && (j<ys-1)){
+            for(int a=-1; a<2; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i+a][j+b]!=er){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
+                }
+            }
+        }else if((j>1) && (i<xs-1) && (j<ys-1)){
+            for(int a=0; a<2; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i+a][j+b]!=er){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
+                }
+            }
+        }else if((i>1) && (i<xs-1) && (j<ys-1)){
+            for(int a=-1; a<2; ++a){
+                for(int b=0; b<2; ++b){
+                    if(zAxe[i+a][j+b]!=er){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
+                }
+            }
+        }else if((i>1) && (j>1) && (i<xs-1)){
+            for(int a=-1; a<2; ++a){
+                for(int b=-1; b<1; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
+                }
+            }
+        }else if((i>1) && (j<1) && (j<ys-1)){
+            for(int a=-1; a<1; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
+                }
+            }
+        }else if((i>1) && (i<xs-1)){
+            for(int a=-1; a<2; ++a){
+                for(int b=0; b<1; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
+                }
+            }
+        }else if((i>1) && (j<ys-1)){
+            for(int a=-1; a<1; ++a){
+                for(int b=0; b<2; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
+                }
+            }
+        }else if((j<1) && (i<xs-1)){
+            for(int a=0; a<1; ++a){
+                for(int b=-1; b<2; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
+                }
+            }
+        }else if((j<1) && (j<ys-1)){
+            for(int a=0; a<2; ++a){
+                for(int b=-1; b<1; ++b){
+                    if(zAxe[i][j]!=er){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
+                }
+            }
+        }
+        return tmp/cnt;
     }
 }
