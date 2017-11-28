@@ -334,7 +334,6 @@ public class MapPoints {
                     }
                 }
             }
-            if(del) idx[i][j] = 0;
         }else if((j>1) && (i<xs-1) && (j<ys-1)){
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<2; ++b){
@@ -343,7 +342,6 @@ public class MapPoints {
                     }
                 }
             }
-            if(del) idx[i][j] = 0;
         }else if((i>1) && (i<xs-1) && (j<ys-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=0; b<2; ++b){
@@ -352,7 +350,6 @@ public class MapPoints {
                     }
                 }
             }
-            if(del) idx[i][j] = 0;
         }else if((i>1) && (j>1) && (i<xs-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=-1; b<1; ++b){
@@ -361,7 +358,6 @@ public class MapPoints {
                     }
                 }
             }
-            if(del) idx[i][j] = 0;
         }else if((i>1) && (j>1) && (j<ys-1)){
             for(int a=-1; a<1; ++a){
                 for(int b=-1; b<2; ++b){
@@ -370,7 +366,6 @@ public class MapPoints {
                     }
                 }
             }
-            if(del) idx[i][j] = 0;
         }else if((i>1) && (i<xs-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=0; b<1; ++b){
@@ -379,7 +374,6 @@ public class MapPoints {
                     }
                 }
             }
-            if(del) idx[i][j] = 0;
         }else if((i>1) && (j<ys-1)){
             for(int a=-1; a<1; ++a){
                 for(int b=0; b<2; ++b){
@@ -388,7 +382,6 @@ public class MapPoints {
                     }
                 }
             }
-            if(del) idx[i][j] = 0;
         }else if((j>1) && (i<xs-1)){
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<1; ++b){
@@ -397,7 +390,6 @@ public class MapPoints {
                     }
                 }
             }
-            if(del) idx[i][j] = 0;
         }else if((j>1) && (j<ys-1)){
             for(int a=0; a<1; ++a){
                 for(int b=-1; b<2; ++b){
@@ -406,8 +398,8 @@ public class MapPoints {
                     }
                 }
             }
-            if(del) idx[i][j] = 0;
         }
+        if(del) idx[i][j] = 0;
     }
     
     public boolean checkReturn(double tabZ[][], int i, int j, int a, int b, double tmp, double dif) {
