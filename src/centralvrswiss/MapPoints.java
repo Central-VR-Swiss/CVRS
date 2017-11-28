@@ -22,10 +22,14 @@ public class MapPoints {
     private final String GREEN = "0.0 1.0 0.0";
     private final String BLUE = "0.0 0.0 1.0";
     private final int xs = 1132;
+    // xs is the number obtained by finding the minimum value and the maximum value of x and adding 1 to the difference
     private final int ys = 925;
+    // ys is same as xs.
     private final int dif = 10;
+    // dif can change the threshold about detecting difference.
     private final double er = -9999.99;
     private final double s_dif = 1.5;
+    //s_dif can change the threshold about deleting points
     
     private String color;
     
@@ -60,6 +64,7 @@ public class MapPoints {
                 }
             }
             
+            int ix = 1;
             // Reading line by line the .dat file
             while((line = br.readLine()) != null){
                 splitter = line.split("[\\s]+"); // Separating in an Array
@@ -70,7 +75,8 @@ public class MapPoints {
                 y = (int)(cY + 35126);
                 // Puting each value in the array
                 zAxe[x][y] = cZ;
-                idx[x][y] = 1;
+                idx[x][y] = ix;
+                ix++;
             }
             System.out.println("Bruh"); // End of the lecture, erase when we will end
             
@@ -103,7 +109,7 @@ public class MapPoints {
                         zAxe[i][j] = deleteErrorPoints(i,j);
                     }
                     reducePoints(i,j);
-                    if(idx[i][j] == 1){
+                    if(idx[i][j] > 0){
                         
                         sb.append(TAB).append(TAB).append(TAB).append(TAB).
                             append(i).append(' ').
@@ -119,7 +125,7 @@ public class MapPoints {
             sb.append(TAB).append(TAB).append(TAB).append("color [\n");
             for(int i = 0; i < xs; ++i) {
                 for(int j = 0; j < ys; ++j){
-                    if(idx[i][j] == 1){
+                    if(idx[i][j] > 0){
                         if(zAxe[i][j] < 0){
                             color = RED;
                         }else if(check(i,j)){
@@ -177,6 +183,7 @@ public class MapPoints {
     }
     public boolean check(int i, int j){
         double tmp;
+        //There are 9 types of filter.
         if((i>1) && (j>1) && (i<xs-1) && (j<ys-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=-1; b<2; ++b){
