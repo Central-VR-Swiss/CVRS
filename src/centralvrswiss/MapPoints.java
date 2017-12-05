@@ -1,7 +1,7 @@
 package centralvrswiss;
 
 import java.io.BufferedReader;
-import java.io.BuggeredWriter;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,10 +9,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.lang.Runtime;
 
 /**
  *
@@ -428,22 +426,24 @@ public class MapPoints {
             cnt++;
         }
     }
+    
     public void callPython(){
         try{
             Runtime runtime = Runtime.getRuntime();
             runtime.exec("python D.py");
         }catch(IOException ex){}
     }
+    
     public void writePoints(){
         try{
             File file = new File("Delaunay.dat");
 
             if (checkBeforeWritefile(file)){
                 PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-                for(int i=0;i<n;i++){
-                    for(int j=0;j<n;j++){
+                for(int i=0;i<xs;i++){
+                    for(int j=0;j<ys;j++){
                         if(idx[i][j]>0){
-                            pw.prinln(i + "," + j + "," + zAxe[i][j]);
+                            pw.println(i + "," + j + "," + zAxe[i][j]);
                         }
                     }
                 }
@@ -457,20 +457,21 @@ public class MapPoints {
     }
 
     private static boolean checkBeforeWritefile(File file){
-    if (file.exists()){
-        if (file.isFile() && file.canWrite()){
-        return true;
+        if (file.exists()){
+            if (file.isFile() && file.canWrite()){
+            return true;
+            }
         }
-    }
 
-    return false;
+        return false;
     }
-    public void readTriangle(){
+    
+    public void readTriangle() throws FileNotFoundException{
             FileInputStream fis = new FileInputStream("Delaunay.dat");
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
 
-            String[] tri 
+//            String[] tri
     }
 
 }
