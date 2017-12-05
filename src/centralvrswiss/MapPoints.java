@@ -1,15 +1,18 @@
 package centralvrswiss;
 
 import java.io.BufferedReader;
+import java.io.BuggeredWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.lang.Runtime;
 
 /**
  *
@@ -41,6 +44,10 @@ public class MapPoints {
     private double cX;
     private double cY;
     private double cZ;
+
+    private int[] triangle1;
+    private int[] triangle2;
+    private int[] triangle3;
  
     public MapPoints(int nbPoints){
 
@@ -98,7 +105,7 @@ public class MapPoints {
             sb.append("#VRML V2.0 utf8\n");
             sb.append("# Test1\n");
             sb.append("Shape {\n");
-            sb.append(TAB).append("geometry PointSet {\n");
+            sb.append(TAB).append("geometry IndexedFaceSet {\n");
             
             // Inserting points in the file
             sb.append(TAB).append(TAB).append("coord Coordinate {\n");
@@ -121,6 +128,13 @@ public class MapPoints {
             sb.append(TAB).append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append(TAB).append("}\n");
             
+            
+            writePoints();
+            callPython();
+
+            sb.append(TAB).append(TAB).append("coordIndex [\n");
+            
+            /*
             sb.append(TAB).append(TAB).append("color Color {\n");
             sb.append(TAB).append(TAB).append(TAB).append("color [\n");
             for(int i = 0; i < xs; ++i) {
@@ -142,6 +156,7 @@ public class MapPoints {
             }
             sb.append(TAB).append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append(TAB).append("}\n");
+            */
             sb.append(TAB).append("}\n");
             
             sb.append("}\n");
@@ -413,4 +428,49 @@ public class MapPoints {
             cnt++;
         }
     }
+    public void callPython(){
+        try{
+            Runtime runtime = Runtime.getRuntime();
+            runtime.exec("python D.py");
+        }catch(IOException ex){}
+    }
+    public void writePoints(){
+        try{
+            File file = new File("Delaunay.dat");
+
+            if (checkBeforeWritefile(file)){
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
+                for(int i=0;i<n;i++){
+                    for(int j=0;j<n;j++){
+                        if(idx[i][j]>0){
+                            pw.prinln(i + "," + j + "," + zAxe[i][j]);
+                        }
+                    }
+                }
+                pw.close();
+            }else{
+                System.out.println("ファイルに書き込めません");
+            }
+        }catch(IOException e){
+            System.out.println(e);
+        }
+    }
+
+    private static boolean checkBeforeWritefile(File file){
+    if (file.exists()){
+        if (file.isFile() && file.canWrite()){
+        return true;
+        }
+    }
+
+    return false;
+    }
+    public void readTriangle(){
+            FileInputStream fis = new FileInputStream("Delaunay.dat");
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+
+            String[] tri 
+    }
+
 }
