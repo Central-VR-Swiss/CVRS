@@ -128,7 +128,7 @@ public class MapPoints {
             sb.append(TAB).append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append(TAB).append("}\n");
             
-            
+
             writePoints();
             callPython();
 
@@ -440,8 +440,8 @@ public class MapPoints {
 
             if (checkBeforeWritefile(file)){
                 PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-                for(int i=0;i<n;i++){
-                    for(int j=0;j<n;j++){
+                for(int i=0;i<xs;i++){
+                    for(int j=0;j<ys;j++){
                         if(idx[i][j]>0){
                             pw.prinln(i + "," + j + "," + zAxe[i][j]);
                         }
