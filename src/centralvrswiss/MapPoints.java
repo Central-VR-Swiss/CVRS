@@ -129,37 +129,47 @@ public class MapPoints {
             
             writePoints();
             callPython();
+            readTriangle();
 
             sb.append(TAB).append(TAB).append("coordIndex [\n");
             
-            try {
-                FileInputStream fis = new FileInputStream(DELAUNAY_FILE);
-                InputStreamReader isr = new InputStreamReader(fis);
-                BufferedReader br = new BufferedReader(isr);
-
-                String triLine;
-                String[] triangle;
-//                String[] points = new String[XS*YS];
-                int k = 0;
-                
-                while((triLine = br.readLine()) != null) {
-                    triangle = triLine.split(",");
-                    sb.append(TAB).append(TAB).append(TAB);
-                    for(int i = 0; i < triangle.length - 1; ++i){
-                        sb.append(triangle[i]).append(", ");
-//                        points[k++] = triangle[i];
-                    }
-                    sb.append("-1,").append('\n');
-                }
-                sb.setCharAt(sb.length() - 2, ' ');
-                
-                br.close();
-                isr.close();
-                fis.close();
-            } catch (IOException ex) {
-                Logger.getLogger(CentralVRSwiss.class.getName()).log(Level.SEVERE, null, ex);
-            }
+//            try {
+//                FileInputStream fis = new FileInputStream(DELAUNAY_FILE);
+//                InputStreamReader isr = new InputStreamReader(fis);
+//                BufferedReader br = new BufferedReader(isr);
+//
+//                String triLine;
+//                String[] triangle;
+////                String[] points = new String[XS*YS];
+//                int k = 0;
+//                
+//                while((triLine = br.readLine()) != null) {
+//                    triangle = triLine.split(",");
+//                    sb.append(TAB).append(TAB).append(TAB);
+//                    for(int i = 0; i < triangle.length - 1; ++i){
+//                        sb.append(triangle[i]).append(", ");
+////                        points[k++] = triangle[i];
+//                    }
+//                    sb.append("-1,").append('\n');
+//                }
+//                sb.setCharAt(sb.length() - 2, ' ');
+//                
+//                br.close();
+//                isr.close();
+//                fis.close();
+//            } catch (IOException ex) {
+//                Logger.getLogger(CentralVRSwiss.class.getName()).log(Level.SEVERE, null, ex);
+//            }
             
+            
+            for(int i=0;i<triangle1.length;i++){
+                sb.append(TAB).append(TAB).append(TAB).
+                            append(triangle1[i]).append(' ').
+                            append(triangle2[i]).append(' ').
+                            append(triangle3[i]).append(' ').
+                            append(-1).append('\n');
+            }
+            sb.append(TAB).append(TAB).append("]\n");
             
             /*
             sb.append(TAB).append(TAB).append("color Color {\n");
@@ -440,10 +450,15 @@ public class MapPoints {
     
     public void callPython(){
         try{
-            Runtime runtime = Runtime.getRuntime();
-            runtime.exec("python D.py");
-            System.out.println("Yolooo");
-        }catch(IOException ex){}
+            ProcessBuilder pb = new ProcessBuilder("Delaunay.bat");
+            Process process = pb.start();
+            int ret = process.waitFor();
+            System.out.println("finish!");
+        }catch(IOException ex){
+            System.out.println(ex);
+        }catch(InterruptedException iex){
+            System.out.println(iex);
+        }
     }
     
     public void writePoints(){
@@ -465,6 +480,18 @@ public class MapPoints {
 //            }else{
 //                System.out.println("ファイルに書き込めません");
 //            }
+            PrintWriter p = new PrintWriter(new File("Delaunay.dat"));
+            StringBuilder s = new StringBuilder();
+
+            for(int i=0;i<XS;i++){
+                for(int j=0;j<YS;j++){
+                    if(idx[i][j]>0){
+                        s.append(i).append(" ").append(j).append(" ").append(zAxe[i][j]).append("\n");
+                    }
+                }
+            }
+            p.write(s.toString());
+            p.close();
         }catch(IOException e){
             System.out.println(e);
         }
@@ -497,5 +524,47 @@ public class MapPoints {
 //            Logger.getLogger(CentralVRSwiss.class.getName()).log(Level.SEVERE, null, ex);
 //        }
 //    }
+
+    public void readTriangle(){
+        try{
+            FileInputStream fis = new FileInputStream("Delaunay.dat");
+            InputStreamReader isr = new InputStreamReader(fis);
+            BufferedReader br = new BufferedReader(isr);
+
+            String tri;
+            String[] splitter2;
+            int a1;
+            int a2;
+            int a3;
+            int cnt = 0;
+
+
+            while((tri = br.readLine()) != null){
+                cnt++;
+            }
+            FileInputStream f = new FileInputStream("Delaunay.dat");
+            InputStreamReader is = new InputStreamReader(f);
+            BufferedReader b = new BufferedReader(is);
+
+            triangle1 = new int[cnt];
+            triangle2 = new int[cnt];
+            triangle3 = new int[cnt];
+            
+            // Reading line by line the Delaunay.dat file
+            cnt = 0;
+            while((tri = b.readLine()) != null){
+                splitter2 = tri.split("[\\s]+"); // Separating in an Array
+                a1 = Integer.parseInt(splitter2[0]);
+                a2 = Integer.parseInt(splitter2[1]);
+                a3 = Integer.parseInt(splitter2[2]);
+                triangle1[cnt] = a1;
+                triangle2[cnt] = a2;
+                triangle3[cnt] = a3;
+            }
+            System.out.println("done!");
+        }catch(IOException e){
+            System.out.println(e);
+        }
+    }
 
 }
