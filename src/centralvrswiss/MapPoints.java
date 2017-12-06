@@ -133,80 +133,23 @@ public class MapPoints {
 
             sb.append(TAB).append(TAB).append("coordIndex [\n");
             
-//            try {
-//                FileInputStream fis = new FileInputStream(DELAUNAY_FILE);
-//                InputStreamReader isr = new InputStreamReader(fis);
-//                BufferedReader br = new BufferedReader(isr);
-//
-//                String triLine;
-//                String[] triangle;
-////                String[] points = new String[XS*YS];
-//                int k = 0;
-//                
-//                while((triLine = br.readLine()) != null) {
-//                    triangle = triLine.split(",");
-//                    sb.append(TAB).append(TAB).append(TAB);
-//                    for(int i = 0; i < triangle.length - 1; ++i){
-//                        sb.append(triangle[i]).append(", ");
-////                        points[k++] = triangle[i];
-//                    }
-//                    sb.append("-1,").append('\n');
-//                }
-//                sb.setCharAt(sb.length() - 2, ' ');
-//                
-//                br.close();
-//                isr.close();
-//                fis.close();
-//            } catch (IOException ex) {
-//                Logger.getLogger(CentralVRSwiss.class.getName()).log(Level.SEVERE, null, ex);
-//            }
             
             
             for(int i=0;i<triangle1.length;i++){
                 sb.append(TAB).append(TAB).append(TAB).
-                            append(triangle1[i]).append(' ').
-                            append(triangle2[i]).append(' ').
-                            append(triangle3[i]).append(' ').
-                            append(-1).append('\n');
+                            append(triangle1[i]).append(", ").
+                            append(triangle2[i]).append(", ").
+                            append(triangle3[i]).append(", ").
+                            append("-1,").append('\n');
             }
-            sb.append(TAB).append(TAB).append("]\n");
+            sb.setCharAt(sb.length() - 2, ' ');
             
-            /*
-            sb.append(TAB).append(TAB).append("color Color {\n");
-            sb.append(TAB).append(TAB).append(TAB).append("color [\n");
-            for(int i = 0; i < XS; ++i) {
-                for(int j = 0; j < YS; ++j){
-                    if(idx[i][j] > 0){
-                        if(zAxe[i][j] < 0){
-                            color = BLUE;
-                        }else if(check(i,j)){
-                            color = RED;
-                        }else{
-                            color = GREEN;
-                        }
-                    
-                
-                        sb.append(TAB).append(TAB).append(TAB).append(TAB).
-                            append(color).append('\n');
-                    }
-                }
-            }
-            sb.append(TAB).append(TAB).append(TAB).append("]\n");
-            sb.append(TAB).append(TAB).append("}\n");
-            */
             sb.append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append("}\n");
             
             sb.append("}\n");
             
-            // Giving a color to the block
-//            sb.append(TAB).append("appearance Appearance {\n");
-//            sb.append(TAB).append(TAB).append("material Material {\n");
-//            sb.append(TAB).append(TAB).append(TAB).append("diffuseColor ").append("1 0 0 #simple red\n");
-//            sb.append(TAB).append(TAB).append("}\n");
-//            sb.append(TAB).append("}\n");
-//            sb.append("}\n");
-            System.out.println("Yeeey" + zAxe.length);
+            System.out.println("Yeeey");
             pw.write(sb.toString());
             pw.close();
             
@@ -450,14 +393,13 @@ public class MapPoints {
     
     public void callPython(){
         try{
-            ProcessBuilder pb = new ProcessBuilder("Delaunay.bat");
+            ProcessBuilder pb = new ProcessBuilder("src/Delaunay.bat");
             Process process = pb.start();
             int ret = process.waitFor();
             System.out.println("finish!");
-        }catch(IOException ex){
+        }catch(IOException | InterruptedException ex){
+            System.out.println("Shit");
             System.out.println(ex);
-        }catch(InterruptedException iex){
-            System.out.println(iex);
         }
     }
     
@@ -527,7 +469,7 @@ public class MapPoints {
 
     public void readTriangle(){
         try{
-            FileInputStream fis = new FileInputStream("Delaunay.dat");
+            FileInputStream fis = new FileInputStream("src/" + DELAUNAY_FILE);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
 
@@ -542,7 +484,8 @@ public class MapPoints {
             while((tri = br.readLine()) != null){
                 cnt++;
             }
-            FileInputStream f = new FileInputStream("Delaunay.dat");
+            
+            FileInputStream f = new FileInputStream("src/" + DELAUNAY_FILE);
             InputStreamReader is = new InputStreamReader(f);
             BufferedReader b = new BufferedReader(is);
 
@@ -557,14 +500,86 @@ public class MapPoints {
                 a1 = Integer.parseInt(splitter2[0]);
                 a2 = Integer.parseInt(splitter2[1]);
                 a3 = Integer.parseInt(splitter2[2]);
+                
                 triangle1[cnt] = a1;
                 triangle2[cnt] = a2;
                 triangle3[cnt] = a3;
+                cnt++;
             }
             System.out.println("done!");
+            
+            b.close();
+            is.close();
+            f.close();
+            
+            br.close();
+            isr.close();
+            fis.close();
+            
         }catch(IOException e){
             System.out.println(e);
         }
     }
 
 }
+
+
+//            try {
+//                FileInputStream fis = new FileInputStream(DELAUNAY_FILE);
+//                InputStreamReader isr = new InputStreamReader(fis);
+//                BufferedReader br = new BufferedReader(isr);
+//
+//                String triLine;
+//                String[] triangle;
+////                String[] points = new String[XS*YS];
+//                int k = 0;
+//                
+//                while((triLine = br.readLine()) != null) {
+//                    triangle = triLine.split(",");
+//                    sb.append(TAB).append(TAB).append(TAB);
+//                    for(int i = 0; i < triangle.length - 1; ++i){
+//                        sb.append(triangle[i]).append(", ");
+////                        points[k++] = triangle[i];
+//                    }
+//                    sb.append("-1,").append('\n');
+//                }
+//                sb.setCharAt(sb.length() - 2, ' ');", "
+//                
+//                br.close();
+//                isr.close();
+//                fis.close();
+//            } catch (IOException ex) {
+//                Logger.getLogger(CentralVRSwiss.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+
+            /*
+            sb.append(TAB).append(TAB).append("color Color {\n");
+            sb.append(TAB).append(TAB).append(TAB).append("color [\n");
+            for(int i = 0; i < XS; ++i) {
+                for(int j = 0; j < YS; ++j){
+                    if(idx[i][j] > 0){
+                        if(zAxe[i][j] < 0){
+                            color = BLUE;
+                        }else if(check(i,j)){
+                            color = RED;
+                        }else{
+                            color = GREEN;
+                        }
+                    
+                
+                        sb.append(TAB).append(TAB).append(TAB).append(TAB).
+                            append(color).append('\n');
+                    }
+                }
+            }
+            sb.append(TAB).append(TAB).append(TAB).append("]\n");
+            sb.append(TAB).append(TAB).append("}\n");
+            */
+            
+            // Giving a color to the block
+//            sb.append(TAB).append("appearance Appearance {\n");
+//            sb.append(TAB).append(TAB).append("material Material {\n");
+//            sb.append(TAB).append(TAB).append(TAB).append("diffuseColor ").append("1 0 0 #simple red\n");
+//            sb.append(TAB).append(TAB).append("}\n");
+//            sb.append(TAB).append("}\n");
+//            sb.append("}\n");
