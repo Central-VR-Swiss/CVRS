@@ -22,22 +22,23 @@ public class MapPoints {
     private final String RED = "1.0 0.0 0.0";
     private final String GREEN = "0.0 1.0 0.0";
     private final String BLUE = "0.0 0.0 1.0";
-    private final int xs = 1132;
-    // xs is the number obtained by finding the minimum value and the maximum value of x and adding 1 to the difference
-    private final int ys = 925;
-    // ys is same as xs.
-    private final double dif = 10;
+    private final String FIRST_FILE = "points/53394620_dsm_1m.dat";
+    private final String DELAUNAY_FILE = "Delaunay.dat";
+    
+    private final int XS = 1132;
+    // XS is the number obtained by finding the minimum value and the maximum value of x and adding 1 to the difference
+    private final int YS = 925;
+    // YS is same as XS.
+    private final double DIF = 10;
     // dif can change the threshold about detecting difference.
-    private final double er = -9999.99;
-    private final double s_dif = 1.5;
+    private final double ERR = -9999.99;
+    private final double S_DIF = 1.5;
     //s_dif can change the threshold about deleting points
     
     private String color;
     
-    private double[][] zAxe = new double[xs][ys];
-    private int[][] idx = new int[xs][ys];
-
-
+    private double[][] zAxe = new double[XS][YS];
+    private int[][] idx = new int[XS][YS];
     
     private double cX;
     private double cY;
@@ -53,7 +54,7 @@ public class MapPoints {
     
     public void initialize() {
         try {
-            FileInputStream ips = new FileInputStream("points/53394620_dsm_1m.dat");
+            FileInputStream ips = new FileInputStream(FIRST_FILE);
             InputStreamReader ipsr = new InputStreamReader(ips);
             BufferedReader br = new BufferedReader(ipsr);
             
@@ -62,8 +63,8 @@ public class MapPoints {
             int x;
             int y;
 
-            for(int i=0; i<xs; ++i){
-                for(int j=0; j<ys; ++j){
+            for(int i=0; i<XS; ++i){
+                for(int j=0; j<YS; ++j){
                     zAxe[i][j] = 0;
                     idx[i][j] = 0;
                 }
@@ -108,9 +109,9 @@ public class MapPoints {
             // Inserting points in the file
             sb.append(TAB).append(TAB).append("coord Coordinate {\n");
             sb.append(TAB).append(TAB).append(TAB).append("point [\n");
-            for(int i = 0; i < xs; ++i) {
-                for(int j = 0; j < ys; ++j){
-                    if(zAxe[i][j]==er){
+            for(int i = 0; i < XS; ++i) {
+                for(int j = 0; j < YS; ++j){
+                    if(zAxe[i][j]==ERR){
                         zAxe[i][j] = deleteErrorPoints(i,j);
                     }
                     reducePoints(i,j);
@@ -126,17 +127,45 @@ public class MapPoints {
             sb.append(TAB).append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append(TAB).append("}\n");
             
-
             writePoints();
             callPython();
 
             sb.append(TAB).append(TAB).append("coordIndex [\n");
             
+            try {
+                FileInputStream fis = new FileInputStream(DELAUNAY_FILE);
+                InputStreamReader isr = new InputStreamReader(fis);
+                BufferedReader br = new BufferedReader(isr);
+
+                String triLine;
+                String[] triangle;
+//                String[] points = new String[XS*YS];
+                int k = 0;
+                
+                while((triLine = br.readLine()) != null) {
+                    triangle = triLine.split(",");
+                    sb.append(TAB).append(TAB).append(TAB);
+                    for(int i = 0; i < triangle.length - 1; ++i){
+                        sb.append(triangle[i]).append(", ");
+//                        points[k++] = triangle[i];
+                    }
+                    sb.append("-1,").append('\n');
+                }
+                sb.setCharAt(sb.length() - 2, ' ');
+                
+                br.close();
+                isr.close();
+                fis.close();
+            } catch (IOException ex) {
+                Logger.getLogger(CentralVRSwiss.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
             /*
             sb.append(TAB).append(TAB).append("color Color {\n");
             sb.append(TAB).append(TAB).append(TAB).append("color [\n");
-            for(int i = 0; i < xs; ++i) {
-                for(int j = 0; j < ys; ++j){
+            for(int i = 0; i < XS; ++i) {
+                for(int j = 0; j < YS; ++j){
                     if(idx[i][j] > 0){
                         if(zAxe[i][j] < 0){
                             color = BLUE;
@@ -155,6 +184,7 @@ public class MapPoints {
             sb.append(TAB).append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append(TAB).append("}\n");
             */
+            sb.append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append("}\n");
             
             sb.append("}\n");
@@ -166,26 +196,7 @@ public class MapPoints {
 //            sb.append(TAB).append(TAB).append("}\n");
 //            sb.append(TAB).append("}\n");
 //            sb.append("}\n");
-
-//    Shape {
-//	geometry PointSet {
-//		coord Coordinate {
-//                    point [
-//                        -1.0 -1.0 0.0,
-//                        1.0 1.0 0.0,
-//                        0.0 0.0 0.0,
-//                    ]
-//                }
-//                color Color {
-//                    color [
-//                        1.0 0.0 0.0,
-//                        0.0 1.0 0.0,
-//                        0.0 0.0 1.0,
-//                    ]
-//                }
-//            }
-//        }
-            
+            System.out.println("Yeeey" + zAxe.length);
             pw.write(sb.toString());
             pw.close();
             
@@ -198,74 +209,74 @@ public class MapPoints {
     public boolean check(int i, int j){
         double tmp = 0.0;
         //There are 9 types of filter.
-        if((i>1) && (j>1) && (i<xs-1) && (j<ys-1)){
+        if((i>1) && (j>1) && (i<XS-1) && (j<YS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=-1; b<2; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, DIF)){
                         return true;
                     }
                 }
             }
-        }else if((j>1) && (i<xs-1) && (j<ys-1)){
+        }else if((j>1) && (i<XS-1) && (j<YS-1)){
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<2; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, DIF)){
                         return true;
                     }
                 }
             }
-        }else if((i>1) && (i<xs-1) && (j<ys-1)){
+        }else if((i>1) && (i<XS-1) && (j<YS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=0; b<2; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, DIF)){
                         return true;
                     }
                 }
             }
-        }else if((i>1) && (j>1) && (i<xs-1)){
+        }else if((i>1) && (j>1) && (i<XS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=-1; b<1; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, DIF)){
                         return true;
                     }
                 }
             }
-        }else if((i>1) && (j>1) && (j<ys-1)){
+        }else if((i>1) && (j>1) && (j<YS-1)){
             for(int a=-1; a<1; ++a){
                 for(int b=-1; b<2; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, DIF)){
                         return true;
                     }
                 }
             }
-        }else if((i>1) && (i<xs-1)){
+        }else if((i>1) && (i<XS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=0; b<1; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, DIF)){
                         return true;
                     }
                 }
             }
-        }else if((i>1) && (j<ys-1)){
+        }else if((i>1) && (j<YS-1)){
             for(int a=-1; a<1; ++a){
                 for(int b=0; b<2; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, DIF)){
                         return true;
                     }
                 }
             }
-        }else if((j>1) && (i<xs-1)){
+        }else if((j>1) && (i<XS-1)){
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<1; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, DIF)){
                         return true;
                     }
                 }
             }
-        }else if((j>1) && (j<ys-1)){
+        }else if((j>1) && (j<YS-1)){
             for(int a=0; a<1; ++a){
                 for(int b=-1; b<2; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, DIF)){
                         return true;
                     }
                 }
@@ -277,55 +288,55 @@ public class MapPoints {
     public double deleteErrorPoints(int i,int j){
         int cnt = 0;
         double tmp = 0;
-        if((i>1) && (j>1) && (i<xs-1) && (j<ys-1)){
+        if((i>1) && (j>1) && (i<XS-1) && (j<YS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=-1; b<2; ++b){
                     deleteError(zAxe, i, j, a, b, tmp, cnt);
                 }
             }
-        }else if((j>1) && (i<xs-1) && (j<ys-1)){
+        }else if((j>1) && (i<XS-1) && (j<YS-1)){
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<2; ++b){
                     deleteError(zAxe, i, j, a, b, tmp, cnt);
                 }
             }
-        }else if((i>1) && (i<xs-1) && (j<ys-1)){
+        }else if((i>1) && (i<XS-1) && (j<YS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=0; b<2; ++b){
                     deleteError(zAxe, i, j, a, b, tmp, cnt);
                 }
             }
-        }else if((i>1) && (j>1) && (i<xs-1)){
+        }else if((i>1) && (j>1) && (i<XS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=-1; b<1; ++b){
                     deleteError(zAxe, i, j, a, b, tmp, cnt);
                 }
             }
-        }else if((i>1) && (j>1) && (j<ys-1)){
+        }else if((i>1) && (j>1) && (j<YS-1)){
             for(int a=-1; a<1; ++a){
                 for(int b=-1; b<2; ++b){
                     deleteError(zAxe, i, j, a, b, tmp, cnt);
                 }
             }
-        }else if((i>1) && (i<xs-1)){
+        }else if((i>1) && (i<XS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=0; b<1; ++b){
                     deleteError(zAxe, i, j, a, b, tmp, cnt);
                 }
             }
-        }else if((i>1) && (j<ys-1)){
+        }else if((i>1) && (j<YS-1)){
             for(int a=-1; a<1; ++a){
                 for(int b=0; b<2; ++b){
                     deleteError(zAxe, i, j, a, b, tmp, cnt);
                 }
             }
-        }else if((j>1) && (i<xs-1)){
+        }else if((j>1) && (i<XS-1)){
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<1; ++b){
                     deleteError(zAxe, i, j, a, b, tmp, cnt);
                 }
             }
-        }else if((j>1) && (j<ys-1)){
+        }else if((j>1) && (j<YS-1)){
             for(int a=0; a<1; ++a){
                 for(int b=-1; b<2; ++b){
                     deleteError(zAxe, i, j, a, b, tmp, cnt);
@@ -339,74 +350,74 @@ public class MapPoints {
         double tmp = 0.0;
         boolean del = true;
         
-        if((i>1) && (j>1) && (i<xs-1) && (j<ys-1)){
+        if((i>1) && (j>1) && (i<XS-1) && (j<YS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=-1; b<2; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, s_dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
                         del = false;
                     }
                 }
             }
-        }else if((j>1) && (i<xs-1) && (j<ys-1)){
+        }else if((j>1) && (i<XS-1) && (j<YS-1)){
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<2; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, s_dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
                         del = false;
                     }
                 }
             }
-        }else if((i>1) && (i<xs-1) && (j<ys-1)){
+        }else if((i>1) && (i<XS-1) && (j<YS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=0; b<2; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, s_dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
                         del = false;
                     }
                 }
             }
-        }else if((i>1) && (j>1) && (i<xs-1)){
+        }else if((i>1) && (j>1) && (i<XS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=-1; b<1; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, s_dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
                         del = false;
                     }
                 }
             }
-        }else if((i>1) && (j>1) && (j<ys-1)){
+        }else if((i>1) && (j>1) && (j<YS-1)){
             for(int a=-1; a<1; ++a){
                 for(int b=-1; b<2; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, s_dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
                         del = false;
                     }
                 }
             }
-        }else if((i>1) && (i<xs-1)){
+        }else if((i>1) && (i<XS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=0; b<1; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, s_dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
                         del = false;
                     }
                 }
             }
-        }else if((i>1) && (j<ys-1)){
+        }else if((i>1) && (j<YS-1)){
             for(int a=-1; a<1; ++a){
                 for(int b=0; b<2; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, s_dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
                         del = false;
                     }
                 }
             }
-        }else if((j>1) && (i<xs-1)){
+        }else if((j>1) && (i<XS-1)){
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<1; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, s_dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
                         del = false;
                     }
                 }
             }
-        }else if((j>1) && (j<ys-1)){
+        }else if((j>1) && (j<YS-1)){
             for(int a=0; a<1; ++a){
                 for(int b=-1; b<2; ++b){
-                    if(checkReturn(zAxe, i, j, a, b, tmp, s_dif)){
+                    if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
                         del = false;
                     }
                 }
@@ -421,7 +432,7 @@ public class MapPoints {
     }
     
     public void deleteError(double tabZ[][], int i, int j, int a, int b, double tmp, double cnt) {
-        if(zAxe[i][j]!=er){
+        if(zAxe[i][j]!=ERR){
             tmp += zAxe[i+a][j+b];
             cnt++;
         }
@@ -431,47 +442,60 @@ public class MapPoints {
         try{
             Runtime runtime = Runtime.getRuntime();
             runtime.exec("python D.py");
+            System.out.println("Yolooo");
         }catch(IOException ex){}
     }
     
     public void writePoints(){
         try{
-            File file = new File("Delaunay.dat");
-
-            if (checkBeforeWritefile(file)){
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-                for(int i=0;i<xs;i++){
-                    for(int j=0;j<ys;j++){
+//            File file = new File("Delaunay.dat");
+//            System.out.println(file.getCanonicalPath());
+//            if (checkBeforeWritefile(file)){
+//                System.out.println("Yolooo");
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(DELAUNAY_FILE)));
+                int k = 0;
+                for(int i=0;i<XS;i++){
+                    for(int j=0;j<YS;j++){
                         if(idx[i][j]>0){
-                            pw.println(i + "," + j + "," + zAxe[i][j]);
+                            pw.println(i + "," + j + "," + zAxe[i][j] + ",");
                         }
                     }
                 }
                 pw.close();
-            }else{
-                System.out.println("ファイルに書き込めません");
-            }
+//            }else{
+//                System.out.println("ファイルに書き込めません");
+//            }
         }catch(IOException e){
             System.out.println(e);
         }
     }
 
-    private static boolean checkBeforeWritefile(File file){
-        if (file.exists()){
-            if (file.isFile() && file.canWrite()){
-            return true;
-            }
-        }
-
-        return false;
-    }
+//    private static boolean checkBeforeWritefile(File file){
+//        System.out.println(file.getName());
+//        if (file.exists()){
+//            System.out.println("Yeeey");
+//            if (file.isFile() && file.canWrite()){
+//                return true;
+//            }
+//        }
+//
+//        return false;
+//    }
     
-    public void readTriangle() throws FileNotFoundException{
-            FileInputStream fis = new FileInputStream("Delaunay.dat");
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader br = new BufferedReader(isr);
-
-//            String[] tri
-    }
+//    public void readTriangle() {
+//        try {
+//            FileInputStream fis = new FileInputStream(DELAUNAY_FILE);
+//            InputStreamReader isr = new InputStreamReader(fis);
+//            BufferedReader br = new BufferedReader(isr);
+//            
+//            String triLine;
+//            
+//            while((triLine = br.readLine()) != null) {
+//                triangle = triLine.split(",");
+//            }
+//        } catch (IOException ex) {
+//            Logger.getLogger(CentralVRSwiss.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
 
 }
