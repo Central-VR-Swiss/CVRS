@@ -1,7 +1,6 @@
 package centralvrswiss;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.lang.ProcessBuilder;
+import java.lang.Process;
 
 /**
  *
@@ -129,9 +130,19 @@ public class MapPoints {
 
             writePoints();
             callPython();
+            readTriangle();
 
             sb.append(TAB).append(TAB).append("coordIndex [\n");
-            
+            for(int i=0;i<triangle1.length;i++){
+                sb.append(TAB).append(TAB).append(TAB).
+                            append(triangle1[i]).append(' ').
+                            append(triangle2[i]).append(' ').
+                            append(triangle3[i]).append(' ').
+                            append(-1).append('\n');
+            }
+            sb.append(TAB).append(TAB).append("]\n");
+
+
             /*
             sb.append(TAB).append(TAB).append("color Color {\n");
             sb.append(TAB).append(TAB).append(TAB).append("color [\n");
@@ -429,49 +440,76 @@ public class MapPoints {
     
     public void callPython(){
         try{
-            Runtime runtime = Runtime.getRuntime();
-            runtime.exec("python D.py");
-        }catch(IOException ex){}
+            ProcessBuilder pb = new ProcessBuilder("Delaunay.bat");
+            Process process = pb.start();
+            int ret = process.waitFor();
+            System.out.println("finish!")
+        }catch(IOException ex){
+            System.out.println(ex);
+        }catch(InterruptedException iex){
+            System.out.println(iex);
+        }
     }
     
     public void writePoints(){
         try{
-            File file = new File("Delaunay.dat");
+            PrintWriter p = new PrintWriter(new File("Delaunay.dat"));
+            StringBuilder s = new StringBuilder();
 
-            if (checkBeforeWritefile(file)){
-                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-                for(int i=0;i<xs;i++){
-                    for(int j=0;j<ys;j++){
-                        if(idx[i][j]>0){
-                            pw.println(i + "," + j + "," + zAxe[i][j]);
-                        }
+            for(int i=0;i<xs;i++){
+                for(int j=0;j<ys;j++){
+                    if(idx[i][j]>0){
+                        s.append(i).append(" ").append(j).append(" ").append(zAxe[i][j]).append("\n");
                     }
                 }
-                pw.close();
-            }else{
-                System.out.println("ファイルに書き込めません");
             }
+            p.write(s.toString());
+            p.close();
         }catch(IOException e){
             System.out.println(e);
         }
     }
 
-    private static boolean checkBeforeWritefile(File file){
-        if (file.exists()){
-            if (file.isFile() && file.canWrite()){
-            return true;
-            }
-        }
-
-        return false;
-    }
-    
-    public void readTriangle() throws FileNotFoundException{
+    public void readTriangle(){
+        try{
             FileInputStream fis = new FileInputStream("Delaunay.dat");
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
 
-//            String[] tri
+            String tri;
+            String[] splitter2;
+            int a1;
+            int a2;
+            int a3;
+            int cnt = 0;
+
+
+            while((tri = br.readLine()) != null){
+                cnt++;
+            }
+            FileInputStream f = new FileInputStream("Delaunay.dat");
+            InputStreamReader is = new InputStreamReader(f);
+            BufferedReader b = new BufferedReader(is);
+
+            triangle1 = new int[cnt];
+            triangle2 = new int[cnt];
+            triangle3 = new int[cnt];
+            
+            // Reading line by line the Delaunay.dat file
+            cnt = 0;
+            while((tri = b.readLine()) != null){
+                splitter2 = tri.split("[\\s]+"); // Separating in an Array
+                a1 = Integer.parseInt(splitter2[0]);
+                a2 = Integer.parseInt(splitter2[1]);
+                a3 = Integer.parseInt(splitter2[2]);
+                triangle1[cnt] = a1;
+                triangle2[cnt] = a2;
+                triangle3[cnt] = a3;
+            }
+            System.out.println("done!");
+        }catch(IOException e){
+            System.out.println(e);
+        }
     }
 
 }
