@@ -35,7 +35,7 @@ public class MapPoints {
     private final double S_DIF = 1.5;
     //s_dif can change the threshold about deleting points
     
-    private String color;
+    // private String color;
     
     private double[][] zAxe = new double[XS][YS];
     private int[][] idx = new int[XS][YS];
@@ -47,9 +47,12 @@ public class MapPoints {
     private int[] triangle1;
     private int[] triangle2;
     private int[] triangle3;
+
+    private int[] cidx;
+    private int cid_c;
  
     public MapPoints(int nbPoints){
-
+        cidx = new int[nbPoints];
     }
     
     public void initialize() {
@@ -84,6 +87,7 @@ public class MapPoints {
                 idx[x][y] = ix;
                 ix++;
             }
+
             System.out.println("Bruh"); // End of the lecture, erase when we will end
             
             br.close();
@@ -99,6 +103,8 @@ public class MapPoints {
         try {
             PrintWriter pw = new PrintWriter(new File("Test.wrl"));
             StringBuilder sb = new StringBuilder();
+            boolean c;
+            int t;
             
             // Creating the .wrl file for VR
             sb.append("#VRML V2.0 utf8\n");
@@ -133,8 +139,6 @@ public class MapPoints {
 
             sb.append(TAB).append(TAB).append("coordIndex [\n");
             
-            
-            
             for(int i=0;i<triangle1.length;i++){
                 sb.append(TAB).append(TAB).append(TAB).
                             append(triangle1[i]).append(", ").
@@ -145,8 +149,44 @@ public class MapPoints {
             sb.setCharAt(sb.length() - 2, ' ');
             
             sb.append(TAB).append(TAB).append("]\n");
+
+            sb.append(TAB).append(TAB).append("colorPerVertex FALSE");
+
+            sb.append(TAB).append(TAB).append("color Color {\n");
+            sb.append(TAB).append(TAB).append(TAB).append("color [\n");
+
+            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(BLUE);
+            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(GREEN);
+
+            sb.append(TAB).append(TAB).append(TAB).append("]\n");
+            sb.append(TAB).append(TAB).append("}\n");
+
+            sb.append(TAB).append(TAB).append("colorIndex[\n");
+            for(int i=0;i<triangle1.length;i++){
+                c = true;
+                for(int j=0;j<cid_c;j++){
+                    t = cidx[j];
+                    if(t==triangle1[i] || t==triangle2[i] || t==triangle3[i]){
+                        sb.append(TAB).append(TAB).append(TAB).append(1).append(" \n");
+                        c = false;
+                        break;
+                    }
+                }
+                if(c){
+                    sb.append(TAB).append(TAB).append(TAB).append(0).append(" \n");
+                }
+            }
+            sb.append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append("}\n");
-            
+
+
+
+            // sb.append(TAB).append("appearance Appearance{\n");
+            // sb.append(TAB).append(TAB).append("material Material{\n");
+            // sb.append(TAB).append(TAB).append(TAB).append("ambientIntensity 0");
+            // sb.append(TAB).append(TAB).append("}\n");
+            // sb.append(TAB).append("}\n");
+
             sb.append("}\n");
             
             System.out.println("Yeeey");
@@ -240,59 +280,86 @@ public class MapPoints {
     
     public double deleteErrorPoints(int i,int j){
         int cnt = 0;
-        double tmp = 0;
+        double tmp = 0.0;
         if((i>1) && (j>1) && (i<XS-1) && (j<YS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=-1; b<2; ++b){
-                    deleteError(zAxe, i, j, a, b, tmp, cnt);
+                    if(zAxe[i+a][j+b]!=ERR){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
                 }
             }
         }else if((j>1) && (i<XS-1) && (j<YS-1)){
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<2; ++b){
-                    deleteError(zAxe, i, j, a, b, tmp, cnt);
+                    if(zAxe[i+a][j+b]!=ERR){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
                 }
             }
         }else if((i>1) && (i<XS-1) && (j<YS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=0; b<2; ++b){
-                    deleteError(zAxe, i, j, a, b, tmp, cnt);
+                    if(zAxe[i+a][j+b]!=ERR){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
                 }
             }
         }else if((i>1) && (j>1) && (i<XS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=-1; b<1; ++b){
-                    deleteError(zAxe, i, j, a, b, tmp, cnt);
+                    if(zAxe[i+a][j+b]!=ERR){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
                 }
             }
         }else if((i>1) && (j>1) && (j<YS-1)){
             for(int a=-1; a<1; ++a){
                 for(int b=-1; b<2; ++b){
-                    deleteError(zAxe, i, j, a, b, tmp, cnt);
+                    if(zAxe[i+a][j+b]!=ERR){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
                 }
             }
         }else if((i>1) && (i<XS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=0; b<1; ++b){
-                    deleteError(zAxe, i, j, a, b, tmp, cnt);
+                    if(zAxe[i+a][j+b]!=ERR){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
                 }
             }
         }else if((i>1) && (j<YS-1)){
             for(int a=-1; a<1; ++a){
                 for(int b=0; b<2; ++b){
-                    deleteError(zAxe, i, j, a, b, tmp, cnt);
+                    if(zAxe[i+a][j+b]!=ERR){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
                 }
             }
         }else if((j>1) && (i<XS-1)){
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<1; ++b){
-                    deleteError(zAxe, i, j, a, b, tmp, cnt);
+                    if(zAxe[i+a][j+b]!=ERR){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
                 }
             }
         }else if((j>1) && (j<YS-1)){
             for(int a=0; a<1; ++a){
                 for(int b=-1; b<2; ++b){
-                    deleteError(zAxe, i, j, a, b, tmp, cnt);
+                    if(zAxe[i+a][j+b]!=ERR){
+                        tmp += zAxe[i+a][j+b];
+                        cnt++;
+                    }
                 }
             }
         }
@@ -301,13 +368,21 @@ public class MapPoints {
     
     public void reducePoints(int i,int j){
         double tmp = 0.0;
-        boolean del = true;
+        int lc = 0;
+        int dcnt = 0;
+        int[][] did = new int[3][3];
+
+        for(int k=0;k<3;k++){
+            for(int l=0;l<3;l++){
+                did[k][l] = 0;
+            }
+        }
         
         if((i>1) && (j>1) && (i<XS-1) && (j<YS-1)){
             for(int a=-1; a<2; ++a){
                 for(int b=-1; b<2; ++b){
                     if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
-                        del = false;
+                        did[a+1][b+1] = 1;
                     }
                 }
             }
@@ -315,7 +390,7 @@ public class MapPoints {
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<2; ++b){
                     if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
-                        del = false;
+                        did[a+1][b+1] = 1;
                     }
                 }
             }
@@ -323,7 +398,7 @@ public class MapPoints {
             for(int a=-1; a<2; ++a){
                 for(int b=0; b<2; ++b){
                     if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
-                        del = false;
+                        did[a+1][b+1] = 1;
                     }
                 }
             }
@@ -331,7 +406,7 @@ public class MapPoints {
             for(int a=-1; a<2; ++a){
                 for(int b=-1; b<1; ++b){
                     if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
-                        del = false;
+                        did[a+1][b+1] = 1;            
                     }
                 }
             }
@@ -339,7 +414,7 @@ public class MapPoints {
             for(int a=-1; a<1; ++a){
                 for(int b=-1; b<2; ++b){
                     if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
-                        del = false;
+                        did[a+1][b+1] = 1;
                     }
                 }
             }
@@ -347,7 +422,7 @@ public class MapPoints {
             for(int a=-1; a<2; ++a){
                 for(int b=0; b<1; ++b){
                     if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
-                        del = false;
+                        did[a+1][b+1] = 1;
                     }
                 }
             }
@@ -355,7 +430,7 @@ public class MapPoints {
             for(int a=-1; a<1; ++a){
                 for(int b=0; b<2; ++b){
                     if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
-                        del = false;
+                        did[a+1][b+1] = 1;
                     }
                 }
             }
@@ -363,7 +438,7 @@ public class MapPoints {
             for(int a=0; a<2; ++a){
                 for(int b=-1; b<1; ++b){
                     if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
-                        del = false;
+                        did[a+1][b+1] = 1;
                     }
                 }
             }
@@ -371,12 +446,27 @@ public class MapPoints {
             for(int a=0; a<1; ++a){
                 for(int b=-1; b<2; ++b){
                     if(checkReturn(zAxe, i, j, a, b, tmp, S_DIF)){
-                        del = false;
+                        did[a+1][b+1] = 1;
                     }
                 }
             }
         }
-        if(del) idx[i][j] = 0;
+        for(int r=0;r<3;r++){
+            for(int l=0;l<3;l++){
+                if(did[r][l]==1){
+                    dcnt++;
+                }
+            }
+        }
+        for(int r=0;r<3;r++){
+            if((did[r][0]==1) && (did[r][1]==1) && (did[r][2]==1)){
+                lc++;
+            }
+            if((did[0][r]==1) && (did[1][r]==1) && (did[2][r]==1)){
+                lc++;
+            }
+        }
+        if(dcnt==8 || lc==1) idx[i][j] = 0;
     }
     
     public boolean checkReturn(double tabZ[][], int i, int j, int a, int b, double tmp, double dif) {
@@ -384,16 +474,10 @@ public class MapPoints {
         return tmp > dif;
     }
     
-    public void deleteError(double tabZ[][], int i, int j, int a, int b, double tmp, double cnt) {
-        if(zAxe[i][j]!=ERR){
-            tmp += zAxe[i+a][j+b];
-            cnt++;
-        }
-    }
     
     public void callPython(){
         try{
-            ProcessBuilder pb = new ProcessBuilder("src/Delaunay.bat");
+            ProcessBuilder pb = new ProcessBuilder("Delaunay.bat");
             Process process = pb.start();
             int ret = process.waitFor();
             System.out.println("finish!");
@@ -410,14 +494,21 @@ public class MapPoints {
 //            if (checkBeforeWritefile(file)){
 //                System.out.println("Yolooo");
                 PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(DELAUNAY_FILE)));
-                int k = 0;
+                int ic = 0;
+                int k=0;
                 for(int i=0;i<XS;i++){
                     for(int j=0;j<YS;j++){
                         if(idx[i][j]>0){
+                            if(zAxe[i][j]>10){
+                                cidx[k] = ic;
+                                k++;
+                            }
                             pw.println(i + "," + j + "," + zAxe[i][j] + ",");
+                            ic++;
                         }
                     }
                 }
+                cid_c = k;
                 pw.close();
 //            }else{
 //                System.out.println("ファイルに書き込めません");
@@ -434,6 +525,8 @@ public class MapPoints {
             }
             p.write(s.toString());
             p.close();
+            System.out.println("written!");
+            System.out.println(k);
         }catch(IOException e){
             System.out.println(e);
         }
@@ -469,7 +562,7 @@ public class MapPoints {
 
     public void readTriangle(){
         try{
-            FileInputStream fis = new FileInputStream("src/" + DELAUNAY_FILE);
+            FileInputStream fis = new FileInputStream(DELAUNAY_FILE);
             InputStreamReader isr = new InputStreamReader(fis);
             BufferedReader br = new BufferedReader(isr);
 
@@ -485,7 +578,7 @@ public class MapPoints {
                 cnt++;
             }
             
-            FileInputStream f = new FileInputStream("src/" + DELAUNAY_FILE);
+            FileInputStream f = new FileInputStream(DELAUNAY_FILE);
             InputStreamReader is = new InputStreamReader(f);
             BufferedReader b = new BufferedReader(is);
 
@@ -506,6 +599,7 @@ public class MapPoints {
                 triangle3[cnt] = a3;
                 cnt++;
             }
+
             System.out.println("done!");
             
             b.close();
@@ -520,7 +614,6 @@ public class MapPoints {
             System.out.println(e);
         }
     }
-
 }
 
 

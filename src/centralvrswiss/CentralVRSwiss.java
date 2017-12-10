@@ -20,7 +20,7 @@ import javafx.event.Event;
  */
 public class CentralVRSwiss {
     
-    private final static String FILE_NAME = "point/53394620_dsm_1m.dat";
+    private final static String FILE_NAME = "points/53394620_dsm_1m.dat";
     private static int nbPoints;
     
     /**
@@ -30,7 +30,7 @@ public class CentralVRSwiss {
         
         CentralVRSwiss cvrs = new CentralVRSwiss();
         
-    
+        cvrs.getNbPoints(FILE_NAME);
         
         MapPoints mp = new MapPoints(nbPoints);
         

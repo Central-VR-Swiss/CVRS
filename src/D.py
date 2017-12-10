@@ -10,7 +10,7 @@ f = open(filename,'r')
 cnt = 0
 for i in f:
     cnt+=1
-f.close
+f.close()
 f2 = open(filename,'r')
 xyz2 = np.zeros((cnt,2))
 
@@ -52,13 +52,13 @@ plt.show()
 print(tri.triangles)
 """
 
-print(tri.simplices[0][0])
+
 d = np.zeros((tri.simplices.shape[0],3),dtype=int)
 for i in range(tri.simplices.shape[0]):
     for j in range(3):
         d[i][j] = tri.simplices[i][j]
 
-f3 = open("Delaunay.dat",'w')
+f3 = open(filename,'w')
 for i in range(d.shape[0]):
     str1 = str(d[i][0]) + " " + str(d[i][1]) + " " + str(d[i][2]) + "\n"
     f3.write(str1)
