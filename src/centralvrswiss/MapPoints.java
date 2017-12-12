@@ -50,6 +50,7 @@ public class MapPoints {
 
     private int[] cidx;
     private int cid_c;
+    private int kc = 0;
  
     public MapPoints(int nbPoints){
         cidx = new int[nbPoints];
@@ -105,6 +106,9 @@ public class MapPoints {
             StringBuilder sb = new StringBuilder();
             boolean c;
             int t;
+            int xc1 = 0;
+            int xc2 = 0;
+
             
             // Creating the .wrl file for VR
             sb.append("#VRML V2.0 utf8\n");
@@ -121,8 +125,16 @@ public class MapPoints {
                         zAxe[i][j] = deleteErrorPoints(i,j);
                     }
                     reducePoints(i,j);
+                    zAxe[0][0] = 0; // 0
+                    zAxe[0][YS-1] = 0;
+                    zAxe[XS-1][0] = 0;
+                    zAxe[XS-1][YS-1] = 0;
+                    idx[0][0] = 1;
+                    idx[0][YS-1] = 1;
+                    idx[XS-1][0] = 1;
+                    idx[XS-1][YS-1] = 1;
                     if(idx[i][j] > 0){
-                        
+                        if(i==0) xc2++;
                         sb.append(TAB).append(TAB).append(TAB).append(TAB).
                             append(i).append(' ').
                             append(j).append(' ').
@@ -130,12 +142,21 @@ public class MapPoints {
                     }
                 }
             }
+
+            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(0).append(' ').append(0).append(' ').append(-20).append('\n');
+            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(0).append(' ').append(YS-1).append(' ').append(-20).append('\n');
+            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(XS-1).append(' ').append(0).append(' ').append(-20).append('\n');
+            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(XS-1).append(' ').append(YS-1).append(' ').append(-20).append('\n');
+            
             sb.append(TAB).append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append(TAB).append("}\n");
             
             writePoints();
             callPython();
             readTriangle();
+
+            int ln = triangle1.length;
+            System.out.println(ln);
 
             sb.append(TAB).append(TAB).append("coordIndex [\n");
             
@@ -146,46 +167,63 @@ public class MapPoints {
                             append(triangle3[i]).append(", ").
                             append("-1,").append('\n');
             }
-            sb.setCharAt(sb.length() - 2, ' ');
+            
+            
+            sb.append(TAB).append(TAB).append(TAB).append(kc).append(", ").append(kc+1).append(", ").append(kc+2).append("-1,\n");
+            sb.append(TAB).append(TAB).append(TAB).append(kc+1).append(", ").append(kc+2).append(", ").append(kc+3).append("-1,\n");
+
+            sb.append(TAB).append(TAB).append(TAB).append(0).append(", ").append(kc-2).append(", ").append(kc).append("-1,\n");//front
+            sb.append(TAB).append(TAB).append(TAB).append(kc-2).append(", ").append(kc).append(", ").append(kc+1).append("-1,\n");//
+            sb.append(TAB).append(TAB).append(TAB).append(kc-2).append(", ").append(kc+1).append(", ").append(kc-1).append("-1,\n");//right side
+            sb.append(TAB).append(TAB).append(TAB).append(kc-1).append(", ").append(kc+1).append(", ").append(kc+3).append("-1,\n");//
+            sb.append(TAB).append(TAB).append(TAB).append(kc-1).append(", ").append(1).append(", ").append(kc+2).append("-1,\n");//back
+            sb.append(TAB).append(TAB).append(TAB).append(kc-1).append(", ").append(kc+2).append(", ").append(kc+3).append("-1,\n");
+            sb.append(TAB).append(TAB).append(TAB).append(1).append(", ").append(0).append(", ").append(kc+2).append("-1,\n");//left side
+            sb.append(TAB).append(TAB).append(TAB).append(0).append(", ").append(kc+2).append(", ").append(kc).append("-1,\n");
+            
+            
+            
+            
             
             sb.append(TAB).append(TAB).append("]\n");
 
-            sb.append(TAB).append(TAB).append("colorPerVertex FALSE");
+            sb.append(TAB).append(TAB).append("colorPerVertex FALSE\n");
+            sb.append(TAB).append(TAB).append("solid TRUE\n");
 
-            sb.append(TAB).append(TAB).append("color Color {\n");
-            sb.append(TAB).append(TAB).append(TAB).append("color [\n");
+            // sb.append(TAB).append(TAB).append("color Color {\n");
+            // sb.append(TAB).append(TAB).append(TAB).append("color [\n");
 
-            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(BLUE);
-            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(GREEN);
+            // sb.append(TAB).append(TAB).append(TAB).append(TAB).append(BLUE);
+            // sb.append(TAB).append(TAB).append(TAB).append(TAB).append(GREEN);
 
-            sb.append(TAB).append(TAB).append(TAB).append("]\n");
-            sb.append(TAB).append(TAB).append("}\n");
+            // sb.append(TAB).append(TAB).append(TAB).append("]\n");
+            // sb.append(TAB).append(TAB).append("}\n");
 
-            sb.append(TAB).append(TAB).append("colorIndex[\n");
-            for(int i=0;i<triangle1.length;i++){
-                c = true;
-                for(int j=0;j<cid_c;j++){
-                    t = cidx[j];
-                    if(t==triangle1[i] || t==triangle2[i] || t==triangle3[i]){
-                        sb.append(TAB).append(TAB).append(TAB).append(1).append(" \n");
-                        c = false;
-                        break;
-                    }
-                }
-                if(c){
-                    sb.append(TAB).append(TAB).append(TAB).append(0).append(" \n");
-                }
-            }
-            sb.append(TAB).append(TAB).append("]\n");
+            // sb.append(TAB).append(TAB).append("colorIndex[\n");
+            // for(int i=0;i<triangle1.length;i++){
+            //     c = true;
+            //     for(int j=0;j<cid_c;j++){
+            //         t = cidx[j];
+            //         if(t==triangle1[i] || t==triangle2[i] || t==triangle3[i]){
+            //             sb.append(TAB).append(TAB).append(TAB).append(1).append(" \n");
+            //             c = false;
+            //             break;
+            //         }
+            //     }
+            //     if(c){
+            //         sb.append(TAB).append(TAB).append(TAB).append(0).append(" \n");
+            //     }
+            // }
+            // sb.append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append("}\n");
 
 
 
-            // sb.append(TAB).append("appearance Appearance{\n");
-            // sb.append(TAB).append(TAB).append("material Material{\n");
-            // sb.append(TAB).append(TAB).append(TAB).append("ambientIntensity 0");
-            // sb.append(TAB).append(TAB).append("}\n");
-            // sb.append(TAB).append("}\n");
+            sb.append(TAB).append("appearance Appearance{\n");
+            sb.append(TAB).append(TAB).append("material Material{\n");
+            sb.append(TAB).append(TAB).append(TAB).append("diffuseColor 1 0 0\n");
+            sb.append(TAB).append(TAB).append("}\n");
+            sb.append(TAB).append("}\n");
 
             sb.append("}\n");
             
@@ -367,8 +405,8 @@ public class MapPoints {
     }
     
     public void reducePoints(int i,int j){
+        boolean line = false;
         double tmp = 0.0;
-        int lc = 0;
         int dcnt = 0;
         int[][] did = new int[3][3];
 
@@ -377,6 +415,8 @@ public class MapPoints {
                 did[k][l] = 0;
             }
         }
+
+        did[1][1] = 1;
         
         if((i>1) && (j>1) && (i<XS-1) && (j<YS-1)){
             for(int a=-1; a<2; ++a){
@@ -458,15 +498,21 @@ public class MapPoints {
                 }
             }
         }
-        for(int r=0;r<3;r++){
-            if((did[r][0]==1) && (did[r][1]==1) && (did[r][2]==1)){
-                lc++;
+        if(((did[0][0]==1) && (did[2][2]==1)) || 
+            ((did[0][2]==1) && (did[2][0]==1)) || 
+            ((did[0][1]==1) && (did[2][1]==1)) || 
+            ((did[1][0]==1) && (did[1][2]==1))){
+                line = true;
             }
-            if((did[0][r]==1) && (did[1][r]==1) && (did[2][r]==1)){
-                lc++;
-            }
+        if(dcnt==9 || line) idx[i][j] = 0;
+        for(int r=0;r<XS;r++){
+            idx[r][0] = 0;
+            idx[r][YS-1] = 0;
         }
-        if(dcnt==8 || lc==1) idx[i][j] = 0;
+        for(int l=0;l<YS;l++){
+            idx[XS-1][l] = 0;
+            idx[0][l] = 0;
+        }
     }
     
     public boolean checkReturn(double tabZ[][], int i, int j, int a, int b, double tmp, double dif) {
@@ -495,15 +541,15 @@ public class MapPoints {
 //                System.out.println("Yolooo");
                 PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(DELAUNAY_FILE)));
                 int ic = 0;
-                int k=0;
+                int k = 0;
                 for(int i=0;i<XS;i++){
                     for(int j=0;j<YS;j++){
                         if(idx[i][j]>0){
-                            if(zAxe[i][j]>10){
+                            kc++;
+                            if(zAxe[i][j]>18){
                                 cidx[k] = ic;
                                 k++;
                             }
-                            pw.println(i + "," + j + "," + zAxe[i][j] + ",");
                             ic++;
                         }
                     }
