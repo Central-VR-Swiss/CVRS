@@ -228,7 +228,7 @@ public class MapPoints {
             
         } catch(FileNotFoundException ex){
             Logger.getLogger(MapPoints.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("入出力エラー");
+                System.out.println("This file cannot be opened.");
         }
     }
     
@@ -549,12 +549,20 @@ public class MapPoints {
                         }
                     }
                 }
+                for(int i=1;i<XS-1;i++){
+                    zAxe[i][0] = 0;
+                    idx[i][0] = 1;
+                    kc++;
+                }
+                for(int i=1;i<YS-1;i++){
+                    zAxe[0][i] = 0;
+                    idx[0][i] = 1;
+                    kc++;
+                }
                 System.out.println(kc);
                 cid_c = k;
                 pw.close();
-//            }else{
-//                System.out.println("ファイルに書き込めません");
-//            }
+
             PrintWriter p = new PrintWriter(new File("Delaunay.dat"));
             StringBuilder s = new StringBuilder();
 
