@@ -2,7 +2,7 @@
 import numpy as np
 from scipy.spatial import Delaunay
 #from mpl_toolkits.mplot3d import Axes3D
-#from matplotlib.tri import Triangulation
+from matplotlib.tri import Triangulation
 
 
 filename = "Delaunay.dat"
@@ -28,9 +28,8 @@ def cl():
         #xyz[2] = float(xyz[2])
 
         
-        x[j] = xyz[0]
-        y[j] = xyz[1]
-        z[j] = xyz[2]
+        x[j] = xyz2[j][0]
+        y[j] = xyz2[j][1]
         
         j+=1
 
@@ -41,6 +40,7 @@ f2.close()
 
 print("done!")
 tri = Delaunay(xyz2)
+#triangle = Triangulation(x,y)
 """
 fig = plt.figure()
 ax = fig.add_subplot(5,1,1,projection='3d')
@@ -52,11 +52,12 @@ plt.show()
 print(tri.triangles)
 """
 
-
+print(tri.simplices)
 d = np.zeros((tri.simplices.shape[0],3),dtype=int)
 for i in range(tri.simplices.shape[0]):
     for j in range(3):
         d[i][j] = tri.simplices[i][j]
+
 
 f3 = open(filename,'w')
 for i in range(d.shape[0]):

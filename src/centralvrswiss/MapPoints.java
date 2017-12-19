@@ -22,7 +22,7 @@ public class MapPoints {
     private final String RED = "1.0 0.0 0.0";
     private final String GREEN = "0.0 1.0 0.0";
     private final String BLUE = "0.0 0.0 1.0";
-    private final String FIRST_FILE = "points/53394620_dsm_1m.dat";
+    private final String FIRST_FILE = "53394620_dsm_1m.dat";
     private final String DELAUNAY_FILE = "Delaunay.dat";
     
     private final int XS = 1132;
@@ -143,10 +143,10 @@ public class MapPoints {
                 }
             }
 
-            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(0).append(' ').append(0).append(' ').append(-20).append('\n');
-            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(0).append(' ').append(YS-1).append(' ').append(-20).append('\n');
-            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(XS-1).append(' ').append(0).append(' ').append(-20).append('\n');
-            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(XS-1).append(' ').append(YS-1).append(' ').append(-20).append('\n');
+            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(0).append(' ').append(0).append(' ').append(-50).append('\n');
+            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(0).append(' ').append(YS-1).append(' ').append(-50).append('\n');
+            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(XS-1).append(' ').append(0).append(' ').append(-50).append('\n');
+            sb.append(TAB).append(TAB).append(TAB).append(TAB).append(XS-1).append(' ').append(YS-1).append(' ').append(-50).append('\n');
             
             sb.append(TAB).append(TAB).append(TAB).append("]\n");
             sb.append(TAB).append(TAB).append("}\n");
@@ -169,17 +169,12 @@ public class MapPoints {
             }
             
             
-            sb.append(TAB).append(TAB).append(TAB).append(kc).append(", ").append(kc+1).append(", ").append(kc+2).append("-1,\n");
-            sb.append(TAB).append(TAB).append(TAB).append(kc+1).append(", ").append(kc+2).append(", ").append(kc+3).append("-1,\n");
+            sb.append(TAB).append(TAB).append(TAB).append(kc).append(", ").append(kc+1).append(", ").append(kc+3).append(", ").append(kc+2).append(",-1,\n");
 
-            sb.append(TAB).append(TAB).append(TAB).append(0).append(", ").append(kc-2).append(", ").append(kc).append("-1,\n");//front
-            sb.append(TAB).append(TAB).append(TAB).append(kc-2).append(", ").append(kc).append(", ").append(kc+1).append("-1,\n");//
-            sb.append(TAB).append(TAB).append(TAB).append(kc-2).append(", ").append(kc+1).append(", ").append(kc-1).append("-1,\n");//right side
-            sb.append(TAB).append(TAB).append(TAB).append(kc-1).append(", ").append(kc+1).append(", ").append(kc+3).append("-1,\n");//
-            sb.append(TAB).append(TAB).append(TAB).append(kc-1).append(", ").append(1).append(", ").append(kc+2).append("-1,\n");//back
-            sb.append(TAB).append(TAB).append(TAB).append(kc-1).append(", ").append(kc+2).append(", ").append(kc+3).append("-1,\n");
-            sb.append(TAB).append(TAB).append(TAB).append(1).append(", ").append(0).append(", ").append(kc+2).append("-1,\n");//left side
-            sb.append(TAB).append(TAB).append(TAB).append(0).append(", ").append(kc+2).append(", ").append(kc).append("-1,\n");
+            sb.append(TAB).append(TAB).append(TAB).append(0).append(", ").append(kc).append(", ").append(kc+2).append(", ").append(kc-2).append(",-1,\n");//front
+            sb.append(TAB).append(TAB).append(TAB).append(kc-2).append(", ").append(kc+2).append(", ").append(kc+3).append(", ").append(kc-1).append(",-1,\n");//right side
+            sb.append(TAB).append(TAB).append(TAB).append(1).append(", ").append(kc-1).append(", ").append(kc+3).append(", ").append(kc+1).append(",-1,\n");//left side
+            sb.append(TAB).append(TAB).append(TAB).append(0).append(", ").append(1).append(", ").append(kc+1).append(", ").append(kc).append(",-1\n");
             
             
             
@@ -188,7 +183,7 @@ public class MapPoints {
             sb.append(TAB).append(TAB).append("]\n");
 
             sb.append(TAB).append(TAB).append("colorPerVertex FALSE\n");
-            sb.append(TAB).append(TAB).append("solid TRUE\n");
+            sb.append(TAB).append(TAB).append("solid FALSE\n");
 
             // sb.append(TAB).append(TAB).append("color Color {\n");
             // sb.append(TAB).append(TAB).append(TAB).append("color [\n");
@@ -233,7 +228,7 @@ public class MapPoints {
             
         } catch(FileNotFoundException ex){
             Logger.getLogger(MapPoints.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("蜈･蜃ｺ蜉帙お繝ｩ繝ｼ");
+                System.out.println("入出力エラー");
         }
     }
     
@@ -554,10 +549,11 @@ public class MapPoints {
                         }
                     }
                 }
+                System.out.println(kc);
                 cid_c = k;
                 pw.close();
 //            }else{
-//                System.out.println("繝輔ぃ繧､繝ｫ縺ｫ譖ｸ縺崎ｾｼ繧√∪縺帙ｓ");
+//                System.out.println("ファイルに書き込めません");
 //            }
             PrintWriter p = new PrintWriter(new File("Delaunay.dat"));
             StringBuilder s = new StringBuilder();
