@@ -125,14 +125,33 @@ public class MapPoints {
                         zAxe[i][j] = deleteErrorPoints(i,j);
                     }
                     reducePoints(i,j);
-                    zAxe[0][0] = 0; // 0
-                    zAxe[0][YS-1] = 0;
-                    zAxe[XS-1][0] = 0;
-                    zAxe[XS-1][YS-1] = 0;
-                    idx[0][0] = 1;
-                    idx[0][YS-1] = 1;
-                    idx[XS-1][0] = 1;
-                    idx[XS-1][YS-1] = 1;
+                }
+            }
+
+            zAxe[0][0] = 0; // 0
+            zAxe[0][YS-1] = 0; //YS-1
+            zAxe[XS-1][0] = 0; //kc-YS-1
+            zAxe[XS-1][YS-1] = 0; //kc-1
+            idx[0][0] = 1;
+            idx[0][YS-1] = 1;
+            idx[XS-1][0] = 1;
+            idx[XS-1][YS-1] = 1;
+
+            for(int i=1;i<XS-1;i++){
+                zAxe[i][0] = 0;
+                idx[i][0] = 1;
+                zAxe[i][YS-1] = 0;
+                idx[i][YS-1] = 1;
+            }
+            for(int i=1;i<YS-1;i++){
+                zAxe[0][i] = 0;
+                idx[0][i] = 1;
+                zAxe[XS-1][i] = 0;
+                idx[XS-1][i] = 1;
+            }
+
+            for(int i = 0; i < XS; ++i) {
+                for(int j = 0; j < YS; ++j){
                     if(idx[i][j] > 0){
                         if(i==0) xc2++;
                         sb.append(TAB).append(TAB).append(TAB).append(TAB).
@@ -156,7 +175,6 @@ public class MapPoints {
             readTriangle();
 
             int ln = triangle1.length;
-            System.out.println(ln);
 
             sb.append(TAB).append(TAB).append("coordIndex [\n");
             
@@ -168,13 +186,25 @@ public class MapPoints {
                             append("-1,").append('\n');
             }
             
-            
-            sb.append(TAB).append(TAB).append(TAB).append(kc).append(", ").append(kc+1).append(", ").append(kc+3).append(", ").append(kc+2).append(",-1,\n");
+            //make a bottom face
+            sb.append(TAB).append(TAB).append(TAB).append(kc).append(", ").append(kc+1).append(", ").append(kc+2).append(",-1,\n");
+            sb.append(TAB).append(TAB).append(TAB).append(kc+2).append(", ").append(kc+1).append(", ").append(kc+3).append(",-1,\n");
 
-            sb.append(TAB).append(TAB).append(TAB).append(0).append(", ").append(kc).append(", ").append(kc+2).append(", ").append(kc-2).append(",-1,\n");//front
-            sb.append(TAB).append(TAB).append(TAB).append(kc-2).append(", ").append(kc+2).append(", ").append(kc+3).append(", ").append(kc-1).append(",-1,\n");//right side
-            sb.append(TAB).append(TAB).append(TAB).append(1).append(", ").append(kc-1).append(", ").append(kc+3).append(", ").append(kc+1).append(",-1,\n");//left side
-            sb.append(TAB).append(TAB).append(TAB).append(0).append(", ").append(1).append(", ").append(kc+1).append(", ").append(kc).append(",-1\n");
+            sb.append(TAB).append(TAB).append(TAB).append(0).append(", ").append(kc).append(", ").append(kc-YS).append(",-1,\n");//front
+            sb.append(TAB).append(TAB).append(TAB).append(kc-YS).append(", ").append(kc).append(", ").append(kc+2).append(",-1,\n");
+
+            sb.append(TAB).append(TAB).append(TAB).append(kc-1).append(", ").append(kc-YS).append(", ").append(kc+3).append(",-1,\n");//right
+            sb.append(TAB).append(TAB).append(TAB).append(kc-YS).append(", ").append(kc+2).append(", ").append(kc+3).append(",-1,\n");
+
+            sb.append(TAB).append(TAB).append(TAB).append(YS-1).append(", ").append(kc-1).append(", ").append(kc+3).append(",-1,\n");//back
+            sb.append(TAB).append(TAB).append(TAB).append(YS-1).append(", ").append(kc+3).append(", ").append(kc+1).append(",-1,\n");
+
+            sb.append(TAB).append(TAB).append(TAB).append(YS-1).append(", ").append(kc+1).append(", ").append(kc).append(",-1,\n");//left
+            sb.append(TAB).append(TAB).append(TAB).append(0).append(", ").append(YS-1).append(", ").append(kc).append(",-1,\n");
+            // sb.append(TAB).append(TAB).append(TAB).append(0).append(", ").append(kc).append(", ").append(kc+2).append(", ").append(XS-1).append(",-1,\n");//front
+            // sb.append(TAB).append(TAB).append(TAB).append(XS-1).append(", ").append(kc+2).append(", ").append(kc+3).append(", ").append(kc-1).append(",-1,\n");//right side
+            // sb.append(TAB).append(TAB).append(TAB).append(kc-XS).append(", ").append(kc-1).append(", ").append(kc+3).append(", ").append(kc+1).append(",-1,\n");//left side
+            // sb.append(TAB).append(TAB).append(TAB).append(0).append(", ").append(kc-XS).append(", ").append(kc+1).append(", ").append(kc).append(",-1\n");
             
             
             
@@ -548,17 +578,7 @@ public class MapPoints {
                             ic++;
                         }
                     }
-                }
-                for(int i=1;i<XS-1;i++){
-                    zAxe[i][0] = 0;
-                    idx[i][0] = 1;
-                    kc++;
-                }
-                for(int i=1;i<YS-1;i++){
-                    zAxe[0][i] = 0;
-                    idx[0][i] = 1;
-                    kc++;
-                }
+                }    
                 System.out.println(kc);
                 cid_c = k;
                 pw.close();
@@ -576,7 +596,6 @@ public class MapPoints {
             p.write(s.toString());
             p.close();
             System.out.println("written!");
-            System.out.println(k);
         }catch(IOException e){
             System.out.println(e);
         }
