@@ -32,7 +32,7 @@ public class MapPoints {
     private final double DIF = 10;
     // dif can change the threshold about detecting difference.
     private final double ERR = -9999.99;
-    private final double S_DIF = 1.5;
+    private final double S_DIF = 2.0;
     //s_dif can change the threshold about deleting points
     
     // private String color;
@@ -523,13 +523,24 @@ public class MapPoints {
                 }
             }
         }
-        if(((did[0][0]==1) && (did[2][2]==1)) || 
-            ((did[0][2]==1) && (did[2][0]==1)) || 
-            ((did[0][1]==1) && (did[2][1]==1)) || 
-            ((did[1][0]==1) && (did[1][2]==1))){
-                line = true;
+        // if(((did[0][0]==1) && (did[2][2]==1)) || 
+        //     ((did[0][2]==1) && (did[2][0]==1)) || 
+        //     ((did[0][1]==1) && (did[2][1]==1)) || 
+        //     ((did[1][0]==1) && (did[1][2]==1))){
+        //         line = true;
+        //     }
+        if(dcnt==9) idx[i][j] = 0;
+
+        dcnt = 0;
+        for(int r=0;r<3;r++){
+            for(int l=0;l<3;l++){
+                if(did[r][l]==0){
+                    dcnt++;
+                }
             }
-        if(dcnt==9 || line) idx[i][j] = 0;
+        }
+        if(dcnt==9) idx[i][j] = 0;
+
         for(int r=0;r<XS;r++){
             idx[r][0] = 0;
             idx[r][YS-1] = 0;
@@ -542,7 +553,7 @@ public class MapPoints {
     
     public boolean checkReturn(double tabZ[][], int i, int j, int a, int b, double tmp, double dif) {
         tmp = Math.abs(tabZ[i][j] - tabZ[i+a][j+b]);
-        return tmp > dif;
+        return tmp < dif;
     }
     
     
